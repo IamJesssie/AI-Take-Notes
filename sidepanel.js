@@ -649,6 +649,7 @@ class SideCueApp {
         if (response?.success) {
           this.isSessionActive = true;
           this.isSessionPaused = false;
+          this.setStatus('listening');
           this.els.btnStart.style.display = 'none';
           this.els.btnPause.style.display = 'flex';
           this.els.btnStop.style.display = 'flex';

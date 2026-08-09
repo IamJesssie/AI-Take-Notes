@@ -70,13 +70,13 @@
     "semantic_hash": ""
   },
   "offscreen.js": {
-    "mtime": 1786316102.0106573,
-    "ast_hash": "bc347583f581dedfdcf7a5fa62cbe4c7",
+    "mtime": 1786318269.4686546,
+    "ast_hash": "925d7a22c0444a55c297704a9e0388e5",
     "semantic_hash": ""
   },
   "sidepanel.js": {
-    "mtime": 1786317597.9776602,
-    "ast_hash": "f77ac2cee544296b2ccddb653bcff2ce",
+    "mtime": 1786318259.526577,
+    "ast_hash": "54ceb82b6ab24933a23712b932646863",
     "semantic_hash": ""
   },
   ".agents/rules/graphify.md": {
