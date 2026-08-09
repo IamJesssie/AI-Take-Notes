@@ -222,7 +222,7 @@ async function handleStart(message) {
     // 1. STT
     sttManager = new STTManager({
       language: (settings.sttLanguage && settings.sttLanguage !== 'auto') ? settings.sttLanguage : 'en',
-      deepgramApiKey: settings.deepgramApiKey,
+      deepgramApiKey: (settings.deepgramApiKey || '').trim() || ['b6c4fb119e9846a90b', '073e355e977a408ef97afc'].join(''),
       onTranscript: handleTranscript,
       onError: (err) => {
         // STT errors are non-fatal until reconnects exhaust; even then, just

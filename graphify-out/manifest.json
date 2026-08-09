@@ -1,7 +1,7 @@
 {
   "background.js": {
-    "mtime": 1786316145.559974,
-    "ast_hash": "cea2a41ffbf9f2a7129c33b8a37f498c",
+    "mtime": 1786316480.8458955,
+    "ast_hash": "e222879e53cf31f803927d437771f8f3",
     "semantic_hash": ""
   },
   "content-overlay.js": {
@@ -15,8 +15,8 @@
     "semantic_hash": ""
   },
   "lib/knowledge-sync.js": {
-    "mtime": 1781187258.659587,
-    "ast_hash": "a2765ebda60a238da02642f6cc3f3669",
+    "mtime": 1786316772.6132398,
+    "ast_hash": "3ad27dee0d8b3a47e2f597fcd9aae4ac",
     "semantic_hash": ""
   },
   "lib/llm-client.js": {
@@ -75,8 +75,8 @@
     "semantic_hash": ""
   },
   "sidepanel.js": {
-    "mtime": 1786316091.9684236,
-    "ast_hash": "594eb130d9004f5184fd4e92f229dda2",
+    "mtime": 1786317597.9776602,
+    "ast_hash": "f77ac2cee544296b2ccddb653bcff2ce",
     "semantic_hash": ""
   },
   ".agents/rules/graphify.md": {
@@ -100,8 +100,8 @@
     "semantic_hash": ""
   },
   "sidepanel.html": {
-    "mtime": 1786316078.9282408,
-    "ast_hash": "f7985484c68fe81b55b638af659f5de0",
+    "mtime": 1786317520.3042088,
+    "ast_hash": "9b3eb81cbd54c4472f459d90e77f7cf4",
     "semantic_hash": ""
   },
   "icons/icon128.png": {
