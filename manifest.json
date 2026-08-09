@@ -15,6 +15,8 @@
     "scripting"
   ],
   "host_permissions": [
+    "https://api.deepgram.com/*",
+    "wss://api.deepgram.com/*",
     "https://*.supabase.co/*",
     "https://openrouter.ai/*",
     "https://meet.google.com/*",
@@ -91,7 +93,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["logo/sidecue_logo_big.png"],
+      "resources": ["logo/sidecue_logo_big.png", "lib/pcm-worklet.js"],
       "matches": ["<all_urls>"]
     },
     {

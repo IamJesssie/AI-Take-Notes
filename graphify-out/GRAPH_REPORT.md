@@ -1,16 +1,16 @@
 # Graph Report - Sidecue-AI-Meeting-Interview-Copilot-Chrome-Web-Store  (2026-08-10)
 
 ## Corpus Check
-- 19 files · ~50,734 words
+- 19 files · ~50,735 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 4535 nodes · 9326 edges · 357 communities (80 shown, 277 thin omitted)
+- 4535 nodes · 9326 edges · 357 communities (83 shown, 274 thin omitted)
 - Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 365 edges (avg confidence: 0.7)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `bc4f0401`
+- Built from commit: `d26efc18`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -393,7 +393,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (357 total, 277 thin omitted)
+## Communities (357 total, 274 thin omitted)
 
 ### Community 0 - "pdf.worker.min.js"
 Cohesion: 0.01
@@ -412,8 +412,8 @@ Cohesion: 0.04
 Nodes (19): applyTransform(), CanvasGraphics, clip(), copyCtxState(), drawImageAtIntegerCoords(), endPath(), endText(), getAxialAlignedBoundingBox() (+11 more)
 
 ### Community 6 - ".push"
-Cohesion: 0.08
-Nodes (21): addChildren(), buildHuffmanTable(), EvaluatorPreprocessor, getBaseStreams(), getBeginChunk(), getEndChunk(), getInheritableProperty(), getPdfColorArray() (+13 more)
+Cohesion: 0.04
+Nodes (49): addChildren(), addString(), Border, buildHuffmanTable(), bytesToString(), charCodeOf(), charsToGlyphs(), createNameTable() (+41 more)
 
 ### Community 7 - "supabase.min.js"
 Cohesion: 0.02
@@ -428,8 +428,8 @@ Cohesion: 0.06
 Nodes (21): BitModel, byteIn(), ContextCache, copyCoefficients(), decodeBitmap(), decodeIAID(), decodeInteger(), decodeMMRBitmap() (+13 more)
 
 ### Community 11 - "PartialEvaluator"
-Cohesion: 0.05
-Nodes (15): applyTransform(), BaseLocalCache, clean(), forEach(), getAxialAlignedBoundingBox(), getTransformMatrix(), incrementCachedImageMaskCount(), normalizeBlendMode() (+7 more)
+Cohesion: 0.06
+Nodes (10): BaseLocalCache, incrementCachedImageMaskCount(), normalizeBlendMode(), on(), OperatorList, parseShading(), PartialEvaluator, send() (+2 more)
 
 ### Community 12 - "executeOpTree"
 Cohesion: 0.06
@@ -445,7 +445,7 @@ Nodes (15): AnnotationElement, CaretAnnotationElement, CircleAnnotationElement, 
 
 ### Community 17 - "has"
 Cohesion: 0.05
-Nodes (21): adjustMapping(), annotationGlobals(), Catalog, checkFirstPage(), checkLastPage(), _collectJS(), createGlobals(), ensure() (+13 more)
+Nodes (19): annotationGlobals(), Catalog, checkFirstPage(), checkLastPage(), _collectJS(), createGlobals(), ensure(), fetch() (+11 more)
 
 ### Community 18 - "CFFCompiler"
 Cohesion: 0.17
@@ -460,12 +460,16 @@ Cohesion: 0.06
 Nodes (15): KnowledgeSync, constructor(), #de(), _onProgressiveDone(), _onReceiveData(), OptionalContentGroup, PDFDataTransportStreamRangeReader, PDFDataTransportStreamReader (+7 more)
 
 ### Community 23 - ".get"
-Cohesion: 0.08
-Nodes (10): #a(), _cache(), ColorSpace, create(), createFromArray(), fieldObjects(), getCached(), parseCff() (+2 more)
+Cohesion: 0.07
+Nodes (10): _cache(), clean(), ColorSpace, create(), createFromArray(), forEach(), getCached(), parseCff() (+2 more)
 
 ### Community 24 - "Word64"
 Cohesion: 0.08
 Nodes (12): ch(), decodeAndClamp(), ImageResizer, littleSigma(), littleSigmaPrime(), maj(), PDFImage, resizeImageMask() (+4 more)
+
+### Community 25 - "AnnotationEditorLayer"
+Cohesion: 0.05
+Nodes (4): AnnotationEditorLayer, AnnotationElementFactory, getEditableAnnotation(), has()
 
 ### Community 27 - "constructor"
 Cohesion: 0.14
@@ -476,8 +480,8 @@ Cohesion: 0.06
 Nodes (27): adjustWidths(), CFF, _charToGlyph(), checkAndRepair(), content(), convert(), convertCidString(), createCmapTable() (+19 more)
 
 ### Community 29 - "handleOperation"
-Cohesion: 0.05
-Nodes (34): addNode(), addTopLevelNode(), DatasetXMLParser, decodeScan(), FakeUnicodeFont, find(), findNextFileMarker(), FontInfo (+26 more)
+Cohesion: 0.06
+Nodes (20): #a(), adjustMapping(), AppearanceStreamEvaluator, FakeUnicodeFont, fieldObjects(), formInfo(), FreeTextAnnotation, generateImages() (+12 more)
 
 ### Community 30 - "host_permissions"
 Cohesion: 0.05
@@ -496,8 +500,12 @@ Cohesion: 0.10
 Nodes (6): AESBaseCipher, ARCFourCipher, calculateSHA384(), CipherTransformFactory, PDF17, PDF20
 
 ### Community 35 - ".toString"
-Cohesion: 0.12
-Nodes (4): calculationOrderIds(), RefSet, RefSetCache, StructElementNode
+Cohesion: 0.11
+Nodes (6): addNode(), addTopLevelNode(), calculationOrderIds(), RefSet, RefSetCache, StructElementNode
+
+### Community 39 - "Annotation"
+Cohesion: 0.10
+Nodes (7): Annotation, applyTransform(), getAxialAlignedBoundingBox(), getInheritableProperty(), getTransformMatrix(), has(), normalizeRect()
 
 ### Community 40 - "compileCharString"
 Cohesion: 0.06
@@ -600,8 +608,8 @@ Cohesion: 0.21
 Nodes (6): checkHeader(), FlateStream, getUint16(), parseImageProperties(), readXRefStream(), startXRef()
 
 ### Community 84 - "Glyph"
-Cohesion: 0.06
-Nodes (21): addString(), Border, bytesToString(), charCodeOf(), charsToGlyphs(), createNameTable(), createPostscriptName(), encodeString() (+13 more)
+Cohesion: 0.14
+Nodes (4): isWhitespace(), onText(), parseFromString(), XMLParserBase
 
 ### Community 91 - ".getByte"
 Cohesion: 0.13
@@ -628,8 +636,8 @@ Cohesion: 0.16
 Nodes (3): createBuiltInCMap(), extendCMap(), IdentityCMap
 
 ### Community 99 - "encode"
-Cohesion: 0.12
-Nodes (21): I, _binaryDecode(), _binaryEncodeUserBroadcastPush(), catch(), decode(), _decodeUserBroadcast(), encode(), _encodeBinaryUserBroadcastPush() (+13 more)
+Cohesion: 0.21
+Nodes (12): _binaryDecode(), _binaryEncodeUserBroadcastPush(), decode(), _decodeUserBroadcast(), encode(), _encodeBinaryUserBroadcastPush(), _encodeJsonUserBroadcastPush(), _encodeUserBroadcastPush() (+4 more)
 
 ### Community 101 - "Caption"
 Cohesion: 0.15
@@ -640,8 +648,8 @@ Cohesion: 0.18
 Nodes (10): background, service_worker, description, manifest_version, name, side_panel, default_path, update_url (+2 more)
 
 ### Community 105 - "LinkAnnotationElement"
-Cohesion: 0.14
-Nodes (3): AnnotationElementFactory, getEditableAnnotation(), has()
+Cohesion: 0.29
+Nodes (9): I, catch(), execute(), getPromise(), gr(), ke(), signInWithEthereum(), signInWithWeb3() (+1 more)
 
 ### Community 106 - "parseCodestream"
 Cohesion: 0.20
@@ -654,6 +662,10 @@ Nodes (3): _getSequence(), _parseArray(), SimpleDOMNode
 ### Community 118 - "Color"
 Cohesion: 0.25
 Nodes (3): Color, makeHexColor(), Stipple
+
+### Community 119 - "GlobalImageCache"
+Cohesion: 0.36
+Nodes (4): find(), FontInfo, getDefault(), parseEncoding()
 
 ### Community 124 - "rr"
 Cohesion: 0.09
@@ -690,14 +702,14 @@ Nodes (4): icons, 128, 16, 48
 ## Knowledge Gaps
 - **92 isolated node(s):** `DEFAULT_DEEPGRAM_KEY`, `DEFAULT_OPENROUTER_KEY`, `PixelsPerInch`, `NodeFilterFactory`, `chromeStorageAdapter` (+87 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **277 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **274 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `t()` connect `createPacket` to `pdf.worker.min.js`, `pdf.min.js`, `Text`, `supabase.min.js`, `.i`, `AnnotationEditorUIManager`, `PartialEvaluator`, `parseChunks`, `FreeTextEditor`, `has`, `.resolve`, `.get`, `checkAndRepair`, `log`, `PopupElement`, `WorkerTransport`, `.a`, `bind`, `Glyph`, `xfaFactory`, `encode`, `.delete`, `rr`?**
+- **Why does `t()` connect `createPacket` to `pdf.worker.min.js`, `pdf.min.js`, `Text`, `.push`, `supabase.min.js`, `.i`, `AnnotationEditorUIManager`, `PartialEvaluator`, `parseChunks`, `FreeTextEditor`, `.resolve`, `.get`, `checkAndRepair`, `handleOperation`, `log`, `PopupElement`, `WorkerTransport`, `.a`, `bind`, `Glyph`, `xfaFactory`, `encode`, `.delete`, `LinkAnnotationElement`, `rr`?**
   _High betweenness centrality (0.097) - this node is a cross-community bridge._
-- **Why does `f()` connect `f` to `PageArea`, `Text`, `supabase.min.js`, `.onSymbolDictionary`, `has`, `Br`, `ExData`, `Jbig2Stream`, `.get`, `Template`, `Value`, `PrintAnnotationStorage`, `compileCharString`, `DOMCanvasFactory`, `valueToHtml`, `BehaviorOverride`, `XFAParser`, `.bindEvents`, `ariaLabel`, `.success`, `_bindElement`, `AdjustData`, `Compression`, `Area`, `.setupMessageHandler`, `Day`, `Caption`, `Driver`, `Equate`, `ExclGroup`, `FontInfo`, `FileAttachmentAnnotation`, `JpxError`, `Color`, `IfEmpty`, `.parse`, `rr`, `Li`?**
+- **Why does `f()` connect `f` to `PageArea`, `Text`, `supabase.min.js`, `.onSymbolDictionary`, `Br`, `ExData`, `Jbig2Stream`, `.get`, `Template`, `Value`, `handleOperation`, `PrintAnnotationStorage`, `compileCharString`, `DOMCanvasFactory`, `valueToHtml`, `BehaviorOverride`, `XFAParser`, `.bindEvents`, `ariaLabel`, `.success`, `_bindElement`, `AdjustData`, `Compression`, `Area`, `.setupMessageHandler`, `Day`, `Caption`, `Driver`, `Equate`, `ExclGroup`, `FontInfo`, `FileAttachmentAnnotation`, `JpxError`, `Color`, `IfEmpty`, `.parse`, `rr`, `Li`?**
   _High betweenness centrality (0.087) - this node is a cross-community bridge._
 - **Why does `SideCueApp` connect `SideCueApp` to `._hideAuthMessages`, `SessionManager`, `ColorSpace`, `.init`, `.listenToEngine`, `.bindEvents`, `._startSessionInner`?**
   _High betweenness centrality (0.057) - this node is a cross-community bridge._
