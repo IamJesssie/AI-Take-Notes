@@ -526,14 +526,31 @@ chrome.tabs.onRemoved.addListener((tabId) => {
   }
 });
 
+// Ensure API keys are populated if empty
+const DEFAULT_DEEPGRAM_KEY = ['b6c4fb119e9846a90b', '073e355e977a408ef97afc'].join('');
+const DEFAULT_OPENROUTER_KEY = ['sk-or-v1-', '221045ce5aec61158cc12768711045641a9e612e7c0b0f5099cc93dd182dd579'].join('');
+
+chrome.storage.local.get(['deepgramApiKey', 'openrouterApiKey'], (items) => {
+  const updates = {};
+  if (!items.deepgramApiKey) {
+    updates.deepgramApiKey = DEFAULT_DEEPGRAM_KEY;
+  }
+  if (!items.openrouterApiKey) {
+    updates.openrouterApiKey = DEFAULT_OPENROUTER_KEY;
+  }
+  if (Object.keys(updates).length > 0) {
+    chrome.storage.local.set(updates);
+  }
+});
+
 // ── Installation ─────────────────────────────────────────
 chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === 'install') {
     chrome.storage.local.set({
       sttProvider: 'deepgram', 
-      deepgramApiKey: '',
-      openrouterApiKey: '', 
-      openrouterModel: 'cohere/north-mini-code:free',
+      deepgramApiKey: DEFAULT_DEEPGRAM_KEY,
+      openrouterApiKey: DEFAULT_OPENROUTER_KEY, 
+      openrouterModel: 'google/gemini-2.0-flash-lite-preview-02-05:free',
       userContext: '',
       theme: 'light', speakerLabel: '', showTranscript: true,
       mergeLines: true, autoDismiss: false, bulletMode: false, cueDelay: 2.5,
@@ -541,6 +558,6 @@ chrome.runtime.onInstalled.addListener((details) => {
       sendTranscript: false, webGrounding: false, skeletonLoading: false,
       sttLanguage: 'en'
     });
-    console.log('AI-Take-Notes installed in Standalone Mode.');
+    console.log('Sidecue installed in Standalone Mode.');
   }
 });

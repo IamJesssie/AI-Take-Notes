@@ -1,13 +1,18 @@
 # Graph Report - Sidecue-AI-Meeting-Interview-Copilot-Chrome-Web-Store  (2026-08-10)
 
 ## Corpus Check
-- 19 files · ~50,769 words
+- 19 files · ~50,826 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
 - 4532 nodes · 9323 edges · 343 communities (88 shown, 255 thin omitted)
 - Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 365 edges (avg confidence: 0.7)
 - Token cost: 0 input · 0 output
+
+## Graph Freshness
+- Built from commit: `f3a8e4fd`
+- Run `git rev-parse HEAD` and compare to check if the graph is stale.
+- Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - pdf.worker.min.js
@@ -478,8 +483,8 @@ Cohesion: 0.08
 Nodes (44): _canPush(), _clearAllTimers(), _clearTimer(), connect(), connectionState(), disconnect(), endpointURL(), flushSendBuffer() (+36 more)
 
 ### Community 33 - "PopupElement"
-Cohesion: 0.07
-Nodes (15): appendText(), BaseSVGFactory, get(), getCtx(), getPathGenerator(), has(), KeyboardManager, #ki() (+7 more)
+Cohesion: 0.08
+Nodes (14): appendText(), BaseSVGFactory, get(), getCtx(), getPathGenerator(), KeyboardManager, #ki(), layout() (+6 more)
 
 ### Community 34 - ".decryptBlock"
 Cohesion: 0.08

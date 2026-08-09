@@ -1,4 +1,4 @@
-// sidepanel.js — AI-Take-Notes Display Client
+// sidepanel.js — Sidecue Display Client
 // Thin UI: receives events from offscreen engine via background relay.
 // All audio, STT, and LLM processing runs in the offscreen document.
 
@@ -372,7 +372,7 @@ class SideCueApp {
 
     const blob = new Blob([text], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
-    const filename = `AITakeNotes_Transcript_${new Date().toISOString().slice(0,10)}_${Date.now()}.txt`;
+    const filename = `Sidecue_Transcript_${new Date().toISOString().slice(0,10)}_${Date.now()}.txt`;
 
     const a = document.createElement('a');
     a.href = url;
@@ -2420,7 +2420,7 @@ class SideCueApp {
     
     const blob = new Blob([text], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
-    const filename = `AITakeNotes_Summary_${new Date().toISOString().slice(0,10)}.txt`;
+    const filename = `Sidecue_Summary_${new Date().toISOString().slice(0,10)}.txt`;
     
     const a = document.createElement('a');
     a.href = url;

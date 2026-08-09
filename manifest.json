@@ -2,9 +2,9 @@
 "update_url": "https://clients2.google.com/service/update2/crx",
 
   "manifest_version": 3,
-  "name": "AI-Take-Notes - AI Meeting & Interview Copilot",
+  "name": "Sidecue - AI Meeting & Interview Copilot",
   "version": "0.4.0",
-  "description": "Real-time AI meeting notes, transcriptions, and interview copilot. Works with Google Meet, Zoom, Teams, and more.",
+  "description": "Real-time AI cues for meetings and interviews. Works with Google Meet, Zoom, and Teams in Chrome.",
   "permissions": [
     "sidePanel",
     "tabCapture",
@@ -74,7 +74,7 @@
       "suggested_key": {
         "default": "Alt+S"
       },
-      "description": "Start AI-Take-Notes session on the current tab"
+      "description": "Start Sidecue session on the current tab"
     }
   },
   "action": {

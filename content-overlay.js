@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════
-   AI-Take-Notes — Content Script Overlay
+   Sidecue — Content Script Overlay
    Transparent floating cue display injected into tab.
    Survives independently of the side panel — receives
    cue events from the offscreen engine via background relay.

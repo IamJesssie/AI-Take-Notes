@@ -1,4 +1,4 @@
-// offscreen.js — AI-Take-Notes Processing Engine (tab-audio-only rebuild)
+// offscreen.js — Sidecue Processing Engine (tab-audio-only rebuild)
 //
 // Captures tab audio from a streamId, plays it back to the user at the
 // default device sample rate (high quality, no audible artifacts), and
@@ -199,7 +199,7 @@ async function handleStart(message) {
     await new Promise(r => setTimeout(r, 200));
   }
   if (state !== STATE.CLAIMED) {
-    reportFatal(new Error(`Cannot start session: no audio stream is parked (state=${state}). Please click the AI-Take-Notes icon on your meeting tab.`));
+    reportFatal(new Error(`Cannot start session: no audio stream is parked (state=${state}). Please click the Sidecue icon on your meeting tab.`));
     return;
   }
 
