@@ -341,5 +341,15 @@
   "339": "TypeFace",
   "340": "version",
   "341": "WebClient",
-  "342": "Whitespace"
+  "342": "Whitespace",
+  "343": "PaginationOverride",
+  "344": "PrinterName",
+  "345": "RadialAxialShading",
+  "346": "RenderPolicy",
+  "347": "Severity",
+  "348": "SilentPrint",
+  "349": "SubsetBelow",
+  "350": "Sup",
+  "351": "TypeFaces",
+  "352": "Xdc"
 }

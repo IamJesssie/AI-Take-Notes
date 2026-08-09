@@ -634,9 +634,9 @@ class SideCueApp {
       return;
     }
 
-    const captureInfo = await this.getCaptureInfo();
+    let captureInfo = await this.getCaptureInfo();
     if (!captureInfo?.hasPendingCapture) {
-      this.showCapturePrompt();
+      this.triggerCaptureActiveTab();
       return;
     }
     this.hideCapturePrompt();
@@ -879,32 +879,42 @@ class SideCueApp {
     });
   }
 
+  triggerCaptureActiveTab() {
+    this.showToast('Connecting meeting tab audio...', 'info');
+    chrome.runtime.sendMessage({ type: 'TRIGGER_CAPTURE_ACTIVE_TAB' }, (resp) => {
+      if (resp && !resp.success) {
+        this.showToast(resp.error || 'Failed to capture tab audio', 'error');
+      }
+    });
+  }
+
   showCapturePrompt() {
     this.pendingSessionStart = true;
-    // Show instruction in the cue area (replaces idle placeholder)
     this.els.cueCards.innerHTML = `
-      <div class="cue-card cue-capture-prompt">
-        <img src="logo/sidecue_logo_big.png" class="capture-prompt-icon" alt="AI-Take-Notes">
-        <p><strong>Open your meeting tab and click the AI-Take-Notes icon</strong> in your Chrome toolbar to connect tab audio.</p>
-        <p class="capture-prompt-sub">Or press <kbd>Alt+S</kbd> while on the meeting tab. The session will start automatically.</p>
+      <div class="cue-card cue-capture-prompt" style="text-align: center; padding: 24px 16px;">
+        <img src="logo/sidecue_logo_big.png" class="capture-prompt-icon" alt="Sidecue" style="width: 56px; height: 56px; margin-bottom: 12px;">
+        <p style="margin-bottom: 12px;"><strong>Open your meeting tab (Zoom, Meet, Teams) and click Connect Audio:</strong></p>
+        <button id="btn-connect-audio-prompt" class="btn btn-primary" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px; width: 100%;">
+          <span class="material-symbols-outlined">graphic_eq</span>
+          Connect Tab Audio & Start
+        </button>
+        <p class="capture-prompt-sub">Or click the Sidecue icon in your Chrome toolbar / press <kbd>Alt+S</kbd> on your meeting tab.</p>
       </div>
     `;
-    // Switch to cues tab so user sees it
+    const btn = this.els.cueCards.querySelector('#btn-connect-audio-prompt');
+    if (btn) btn.addEventListener('click', () => this.triggerCaptureActiveTab());
     this.switchTab('cues');
   }
 
   showCaptureError(message) {
-    // Inline, persistent capture-error state. Replaces (doesn't stack) the
-    // empty placeholder until the user takes action.
     this.els.cueCards.innerHTML = `
       <div class="cue-card cue-capture-error">
         <span class="material-symbols-outlined capture-error-icon">error_outline</span>
         <p class="capture-error-title">Can’t capture this page</p>
         <p class="capture-error-msg"></p>
-        <p class="capture-prompt-sub">Open a meeting tab (Google Meet, Zoom, Teams…) or any web page with audio, then click the AI-Take-Notes icon or press <kbd>Alt+S</kbd>.</p>
+        <p class="capture-prompt-sub">Open a meeting tab (Google Meet, Zoom, Teams…) or any web page with audio, then click the Sidecue icon or press <kbd>Alt+S</kbd>.</p>
       </div>
     `;
-    // Set message via textContent to avoid HTML injection from the error string
     const msgEl = this.els.cueCards.querySelector('.capture-error-msg');
     if (msgEl) msgEl.textContent = message;
     this.switchTab('cues');
@@ -912,29 +922,19 @@ class SideCueApp {
 
   hideCapturePrompt() {
     this.pendingSessionStart = false;
-    // Restore default placeholder — same instruction wording as the initial placeholder
-    // so users always see the same call to action when no session is in progress.
     this.els.cueCards.innerHTML = `
       <div class="cue-card cue-placeholder">
-        <img src="logo/sidecue_logo_big.png" class="placeholder-app-icon" alt="AI-Take-Notes">
-        <p><strong>Open your meeting tab</strong> (Google Meet, Zoom, Teams…) and click the <strong>AI-Take-Notes icon</strong> in your Chrome toolbar to start.</p>
+        <img src="logo/sidecue_logo_big.png" class="placeholder-app-icon" alt="Sidecue">
+        <p><strong>Open your meeting tab</strong> (Google Meet, Zoom, Teams…) and click the <strong>Sidecue icon</strong> in your Chrome toolbar to start.</p>
         <p class="capture-prompt-sub">Or press <kbd>Alt+S</kbd> while on the meeting tab.</p>
       </div>
     `;
   }
 
   // ── Ready-To-Start State ─────────────────────────────
-  // After background captures a tab's audio, we land in this state: capture
-  // is parked but NOTHING is streaming to Deepgram or Gemini yet. The user
-  // must click Start to begin transcription. This is the explicit-consent
-  // gate — nothing counts against their quota until they click.
   showReadyToStart(tabTitle) {
     if (this.isSessionActive || this.isSessionStarting) return;
 
-    // Idempotency: TAB_CAPTURED can be re-broadcast (retry loop in background,
-    // or _reconcilePendingCapture racing the listener). If we're already in
-    // Ready state for the same tab, skip the DOM rebuild — otherwise the panel
-    // visibly flickers as innerHTML is reassigned in quick succession.
     if (this._readyTabTitle === tabTitle && this.els.cueCards.querySelector('.cue-ready')) {
       return;
     }
@@ -945,7 +945,6 @@ class SideCueApp {
     this.els.btnPause.style.display = 'none';
     this.els.btnStop.style.display = 'none';
 
-    // Show which tab will be captured
     const nameEl = document.getElementById('capture-tab-name');
     const infoEl = document.getElementById('capture-info');
     if (tabTitle && nameEl && infoEl) {
@@ -953,11 +952,10 @@ class SideCueApp {
       infoEl.style.display = 'flex';
     }
 
-    // Replace the placeholder with a clear "Ready" card
     const safeTitle = tabTitle ? String(tabTitle) : 'your meeting tab';
     this.els.cueCards.innerHTML = `
       <div class="cue-card cue-placeholder cue-ready">
-        <img src="logo/sidecue_logo_big.png" class="placeholder-app-icon" alt="AI-Take-Notes">
+        <img src="logo/sidecue_logo_big.png" class="placeholder-app-icon" alt="Sidecue">
         <p><strong>Ready to start.</strong></p>
         <p>Tab audio is connected. Click <strong>Start</strong> when your meeting begins — recording and transcription will only run while a session is active.</p>
         <p class="capture-prompt-sub ready-tab-line"></p>

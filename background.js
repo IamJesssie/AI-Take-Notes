@@ -398,6 +398,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       break;
 
     // ── From sidepanel: info queries ──
+    case 'TRIGGER_CAPTURE_ACTIVE_TAB':
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs[0]) {
+          startCaptureFlow(tabs[0]);
+          sendResponse({ success: true, tabTitle: tabs[0].title });
+        } else {
+          sendResponse({ success: false, error: 'No active tab found' });
+        }
+      });
+      async = true;
+      break;
+
     case 'GET_CAPTURE_INFO':
       sendResponse({
         hasPendingCapture: !!pendingStreamId,
