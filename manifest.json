@@ -1,0 +1,142 @@
+{
+"update_url": "https://clients2.google.com/service/update2/crx",
+
+  "manifest_version": 3,
+  "name": "AI-Take-Notes - AI Meeting & Interview Copilot",
+  "version": "0.4.0",
+  "description": "Real-time AI meeting notes, transcriptions, and interview copilot. Works with Google Meet, Zoom, Teams, and more.",
+  "permissions": [
+    "sidePanel",
+    "tabCapture",
+    "activeTab",
+    "storage",
+    "identity",
+    "offscreen",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://*.supabase.co/*",
+    "https://openrouter.ai/*",
+    "https://meet.google.com/*",
+    "https://*.zoom.us/*",
+    "https://teams.microsoft.com/*",
+    "https://teams.live.com/*",
+    "https://*.webex.com/*",
+    "https://*.gotomeeting.com/*",
+    "https://*.goto.com/*",
+    "https://*.bluejeans.com/*",
+    "https://*.ringcentral.com/*",
+    "https://*.dialpad.com/*",
+    "https://app.chime.aws/*",
+    "https://*.vonage.com/*",
+    "https://web.skype.com/*",
+    "https://meet.jit.si/*",
+    "https://*.8x8.vc/*",
+    "https://whereby.com/*",
+    "https://*.whereby.com/*",
+    "https://*.around.co/*",
+    "https://*.gather.town/*",
+    "https://app.gather.town/*",
+    "https://*.daily.co/*",
+    "https://*.livekit.io/*",
+    "https://*.livestorm.co/*",
+    "https://*.demio.com/*",
+    "https://*.crowdcast.io/*",
+    "https://*.hopin.com/*",
+    "https://*.butter.us/*",
+    "https://*.vowel.com/*",
+    "https://*.pop.com/*",
+    "https://app.slack.com/*",
+    "https://discord.com/*",
+    "https://*.riverside.fm/*",
+    "https://*.streamyard.com/*",
+    "https://*.restream.io/*",
+    "https://*.loom.com/*",
+    "https://*.larksuite.com/*",
+    "https://*.feishu.cn/*",
+    "https://*.voovmeeting.com/*",
+    "https://*.dingtalk.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "commands": {
+    "toggle-pause": {
+      "suggested_key": {
+        "default": "Alt+P"
+      },
+      "description": "Pause / Resume session"
+    },
+    "start-session": {
+      "suggested_key": {
+        "default": "Alt+S"
+      },
+      "description": "Start AI-Take-Notes session on the current tab"
+    }
+  },
+  "action": {
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["logo/sidecue_logo_big.png"],
+      "matches": ["<all_urls>"]
+    },
+    {
+      "resources": ["content-overlay.css", "lib/pdf.worker.min.js", "logo/sidecue_logo_big.png"],
+      "matches": [
+        "https://meet.google.com/*",
+        "https://*.zoom.us/*",
+        "https://teams.microsoft.com/*",
+        "https://teams.live.com/*",
+        "https://*.webex.com/*",
+        "https://*.gotomeeting.com/*",
+        "https://*.goto.com/*",
+        "https://*.bluejeans.com/*",
+        "https://*.ringcentral.com/*",
+        "https://*.dialpad.com/*",
+        "https://app.chime.aws/*",
+        "https://*.vonage.com/*",
+        "https://web.skype.com/*",
+        "https://meet.jit.si/*",
+        "https://*.8x8.vc/*",
+        "https://whereby.com/*",
+        "https://*.whereby.com/*",
+        "https://*.around.co/*",
+        "https://*.gather.town/*",
+        "https://app.gather.town/*",
+        "https://*.daily.co/*",
+        "https://*.livekit.io/*",
+        "https://*.livestorm.co/*",
+        "https://*.demio.com/*",
+        "https://*.crowdcast.io/*",
+        "https://*.hopin.com/*",
+        "https://*.butter.us/*",
+        "https://*.vowel.com/*",
+        "https://*.pop.com/*",
+        "https://app.slack.com/*",
+        "https://discord.com/*",
+        "https://*.riverside.fm/*",
+        "https://*.streamyard.com/*",
+        "https://*.restream.io/*",
+        "https://*.loom.com/*",
+        "https://*.larksuite.com/*",
+        "https://*.feishu.cn/*",
+        "https://*.voovmeeting.com/*",
+        "https://*.dingtalk.com/*"
+      ]
+    }
+  ]
+}

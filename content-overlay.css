@@ -1,0 +1,295 @@
+/* ═══════════════════════════════════════════════════
+   AI-Take-Notes — Content Script Overlay Styles
+   Transparent floating cue panel injected into tab.
+   Survives independently of the side panel.
+   ═══════════════════════════════════════════════════ */
+
+#sidecue-overlay {
+  all: initial;
+  position: fixed;
+  top: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2147483647;
+  width: 640px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  pointer-events: auto;
+  user-select: none;
+  direction: ltr;
+}
+
+#sidecue-overlay *,
+#sidecue-overlay *::before,
+#sidecue-overlay *::after {
+  all: unset;
+  box-sizing: border-box;
+}
+
+/* ─── Container ─── */
+#sidecue-overlay .sc-container {
+  display: flex;
+  flex-direction: column;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06);
+  backdrop-filter: blur(4px);
+  background: rgba(18, 18, 18, 0.85);
+  transition: opacity 200ms ease;
+  position: relative;
+}
+
+/* ─── Drag Bar ─── */
+#sidecue-overlay .sc-drag {
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
+  cursor: move;
+  min-height: 28px;
+  background: rgba(30, 30, 30, 0.95);
+  gap: 6px;
+}
+
+#sidecue-overlay .sc-drag-icon {
+  font-size: 13px;
+  color: rgba(255,255,255,0.2);
+}
+
+/* ─── Status Badge (in drag bar) ─── */
+#sidecue-overlay .sc-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: 1;
+  pointer-events: none;
+}
+
+#sidecue-overlay .sc-status-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+#sidecue-overlay .sc-dot-idle {
+  background: rgba(255,255,255,0.25);
+}
+
+#sidecue-overlay .sc-dot-listening {
+  background: #81c995;
+  animation: sc-pulse-dot 1.5s ease-in-out infinite;
+}
+
+#sidecue-overlay .sc-dot-processing {
+  background: #60a5fa;
+  animation: sc-pulse-dot 0.8s ease-in-out infinite;
+}
+
+#sidecue-overlay .sc-dot-error {
+  background: #f2b8b5;
+}
+
+#sidecue-overlay .sc-status-text {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+@keyframes sc-pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+
+/* ─── Controls ─── */
+#sidecue-overlay .sc-controls {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+#sidecue-overlay .sc-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  color: rgba(255,255,255,0.35);
+  transition: background 150ms ease, color 150ms ease;
+}
+
+#sidecue-overlay .sc-icon-btn:hover {
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.6);
+}
+
+#sidecue-overlay .sc-icon-btn.sc-close:hover {
+  background: rgba(242,184,181,0.15);
+  color: #f2b8b5;
+}
+
+#sidecue-overlay .sc-icon-btn.sc-stop {
+  display: none; /* shown dynamically when session active */
+  color: #f2b8b5;
+  font-size: 10px;
+}
+
+#sidecue-overlay .sc-icon-btn.sc-stop:hover {
+  background: rgba(242,184,181,0.15);
+  color: #f2b8b5;
+}
+
+/* ─── Display Area ─── */
+#sidecue-overlay .sc-display {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 20px 16px;
+  gap: 0;
+  overflow-y: auto;
+  max-height: 400px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+
+#sidecue-overlay .sc-display::-webkit-scrollbar { width: 4px; }
+#sidecue-overlay .sc-display::-webkit-scrollbar-track { background: transparent; }
+#sidecue-overlay .sc-display::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+/* ─── Question Line ─── */
+#sidecue-overlay .sc-question {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #60a5fa;
+  line-height: 1.4;
+  min-height: 0;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(96, 165, 250, 0.2);
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+#sidecue-overlay .sc-question:empty {
+  display: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+}
+
+/* ─── Answer Area ─── */
+#sidecue-overlay .sc-answer {
+  display: block;
+  font-size: 18px;
+  font-weight: 400;
+  color: #e6e1e5;
+  line-height: 1.5;
+  flex-shrink: 1;
+  overflow-wrap: break-word;
+}
+
+#sidecue-overlay .sc-answer p {
+  display: block;
+  margin: 0 0 8px 0;
+}
+
+#sidecue-overlay .sc-answer p:last-child {
+  margin-bottom: 0;
+}
+
+#sidecue-overlay .sc-answer strong {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+#sidecue-overlay .sc-answer em {
+  font-style: italic;
+  color: rgba(255,255,255,0.65);
+}
+
+/* ─── Bullet Points Mode ─── */
+
+
+/* ─── Waiting / Status / Error ─── */
+#sidecue-overlay .sc-waiting {
+  display: block;
+  font-size: 14px;
+  color: rgba(255,255,255,0.25);
+  font-style: italic;
+}
+
+#sidecue-overlay .sc-error {
+  display: block;
+  font-size: 13px;
+  color: #f2b8b5;
+}
+
+#sidecue-overlay .sc-status-pulse {
+  display: inline-block;
+  color: #81c995;
+  animation: sc-pulse 1.2s ease-in-out infinite;
+  font-size: 14px;
+  margin-right: 4px;
+}
+
+#sidecue-overlay .sc-status-spin {
+  display: inline-block;
+  color: #60a5fa;
+  animation: sc-spin 1s linear infinite;
+  font-size: 14px;
+  margin-right: 4px;
+}
+
+/* ─── Streaming Cursor ─── */
+#sidecue-overlay .sc-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 16px;
+  background: #60a5fa;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: sc-blink 0.8s step-end infinite;
+}
+
+/* ─── Resize Handle ─── */
+#sidecue-overlay .sc-resize {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 16px;
+  height: 16px;
+  cursor: nwse-resize;
+  opacity: 0.15;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+#sidecue-overlay .sc-resize:hover {
+  opacity: 0.4;
+}
+
+/* ─── Animations ─── */
+@keyframes sc-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+@keyframes sc-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes sc-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}

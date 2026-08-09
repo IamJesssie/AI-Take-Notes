@@ -1,0 +1,127 @@
+{
+  "background.js": {
+    "mtime": 1782972495.198496,
+    "ast_hash": "aa6e2bea6957da1f64ef27fb3f930b9e",
+    "semantic_hash": ""
+  },
+  "content-overlay.js": {
+    "mtime": 1781187259.019616,
+    "ast_hash": "df40cd922a68e49a85895c780a45028f",
+    "semantic_hash": ""
+  },
+  "lib/file-reader.js": {
+    "mtime": 1781187258.599743,
+    "ast_hash": "0be296c054e117a3ce41c01dd360fceb",
+    "semantic_hash": ""
+  },
+  "lib/knowledge-sync.js": {
+    "mtime": 1781187258.659587,
+    "ast_hash": "a2765ebda60a238da02642f6cc3f3669",
+    "semantic_hash": ""
+  },
+  "lib/llm-client.js": {
+    "mtime": 1781189547.1926441,
+    "ast_hash": "334775ff65f0973c72c97e9792d288c9",
+    "semantic_hash": ""
+  },
+  "lib/pcm-worklet.js": {
+    "mtime": 1781187258.692366,
+    "ast_hash": "81c106bb8aef96e126c7f57a01b0ab15",
+    "semantic_hash": ""
+  },
+  "lib/pdf.min.js": {
+    "mtime": 1781187258.7185197,
+    "ast_hash": "96de323330f8b8336f637a0051835e00",
+    "semantic_hash": ""
+  },
+  "lib/pdf.worker.min.js": {
+    "mtime": 1781187258.7598467,
+    "ast_hash": "a53a71a2a5d618ed0f86ebf099db032a",
+    "semantic_hash": ""
+  },
+  "lib/session-manager.js": {
+    "mtime": 1781188452.7481258,
+    "ast_hash": "47ddb0d55f1e0535cee9e6c878cceeac",
+    "semantic_hash": ""
+  },
+  "lib/stt-deepgram.js": {
+    "mtime": 1781187258.84869,
+    "ast_hash": "ea9c6d50ac8c8d032fcdb1af33c72e19",
+    "semantic_hash": ""
+  },
+  "lib/stt-manager.js": {
+    "mtime": 1781187258.8643315,
+    "ast_hash": "b29dcf8bf0c7116fd56cad68693c5a9d",
+    "semantic_hash": ""
+  },
+  "lib/supabase-client.js": {
+    "mtime": 1781187258.884997,
+    "ast_hash": "def34f1b78c7c151c9a065c80bf57fc4",
+    "semantic_hash": ""
+  },
+  "lib/supabase.min.js": {
+    "mtime": 1781187258.9011228,
+    "ast_hash": "14fa32782457b285df35a74903b8678f",
+    "semantic_hash": ""
+  },
+  "manifest.json": {
+    "mtime": 1781188473.0730376,
+    "ast_hash": "20cfd645476bbd4e8485baccef8f4255",
+    "semantic_hash": ""
+  },
+  "offscreen.js": {
+    "mtime": 1781188445.180417,
+    "ast_hash": "bc347583f581dedfdcf7a5fa62cbe4c7",
+    "semantic_hash": ""
+  },
+  "sidepanel.js": {
+    "mtime": 1783661598.7543097,
+    "ast_hash": "6637badd9c5faa594c5f7563c49be918",
+    "semantic_hash": ""
+  },
+  ".agents/rules/graphify.md": {
+    "mtime": 1784725823.198772,
+    "ast_hash": "a0e4d192b9e2e17256124dbfc8e24e6a",
+    "semantic_hash": ""
+  },
+  ".agents/workflows/graphify.md": {
+    "mtime": 1784725823.2024846,
+    "ast_hash": "637776aa6f7496d069afe7520c845c8a",
+    "semantic_hash": ""
+  },
+  "Sidecue_Transcript_2026-06-11_1781193726195.txt": {
+    "mtime": 1781193738.7337427,
+    "ast_hash": "cd82ad825cfc5a3a048eb2ad9dcd17c7",
+    "semantic_hash": ""
+  },
+  "offscreen.html": {
+    "mtime": 1781187259.0729947,
+    "ast_hash": "7217323c17dc1a93e5f25de3cf8853a9",
+    "semantic_hash": ""
+  },
+  "sidepanel.html": {
+    "mtime": 1786290885.2650933,
+    "ast_hash": "c98b25a69fe49579b3bdf627562dd4f1",
+    "semantic_hash": ""
+  },
+  "icons/icon128.png": {
+    "mtime": 1781187258.5077891,
+    "ast_hash": "fc2eb1e342ccce89afef5a09d6976aee",
+    "semantic_hash": ""
+  },
+  "icons/icon16.png": {
+    "mtime": 1781187258.5551407,
+    "ast_hash": "a8f6e894830e8400aef3835b6b72b503",
+    "semantic_hash": ""
+  },
+  "icons/icon48.png": {
+    "mtime": 1781187258.5752883,
+    "ast_hash": "92a6de3dc679f1f24e852a6c649686a4",
+    "semantic_hash": ""
+  },
+  "logo/sidecue_logo_big.png": {
+    "mtime": 1781187258.932386,
+    "ast_hash": "8ccbb8c20b70069711105d484fd1e454",
+    "semantic_hash": ""
+  }
+}

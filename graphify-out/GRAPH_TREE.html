@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>/ — graphify tree viewer</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f9f9f9;
+      color: #333;
+    }
+    h1 {
+      margin: 20px 0 0 24px;
+      font-size: 2.2rem;
+      font-weight: bold;
+      color: #1e3a56;
+    }
+    .controls {
+      margin: 20px 0 15px 24px;
+    }
+    button {
+      margin-right: 10px;
+      padding: 8px 18px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.2s ease-in-out;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    button:active {
+      background: #004085;
+    }
+    #tree-container {
+      width: calc(100vw - 48px); /* Adjust for body margin/padding */
+      height: 85vh;
+      overflow: auto;
+      border-radius: 8px;
+      background: #fff;
+      margin-left: 24px;
+      margin-right: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border: 1px solid #ddd;
+    }
+    svg {
+      background: #fff;
+      border-radius: 8px;
+      display: block; /* Important for D3 */
+    }
+    .node circle {
+      stroke-width: 2.5px;
+    }
+    .node text { /* Base style for the <text> container */
+      font: 13px 'Segoe UI', sans-serif;
+      paint-order: stroke fill; /* Ensures text is readable over lines */
+      stroke: #fff; /* White halo */
+      stroke-width: 3px; /* Halo thickness */
+      stroke-linejoin: round;
+      stroke-opacity: 0.85; /* Halo opacity */
+    }
+    .link {
+      fill: none;
+      stroke-opacity: 0.7;
+      stroke-width: 2px;
+    }
+  </style>
+</head>
+<body>
+  <h1>/ — Knowledge Graph</h1>
+  <div class="controls">
+    <button onclick="expandAll()">Expand All</button>
+    <button onclick="collapseAll()">Collapse All</button>
+    <button onclick="resetView()">Reset View</button>
+  </div>
+  <div id="tree-container">
+    <svg id="tree-svg" width="6000" height="8000"></svg>
+  </div>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script>
+    const initialJsonData = {"name":"/","total_count":4489,"children":[{"name":".agents","total_count":4,"children":[{"name":"rules","total_count":2,"children":[{"name":"graphify.md","total_count":2,"children":[{"name":"graphify","total_count":1,"children":[]},{"name":"rules/graphify.md","total_count":1,"children":[]}]}]},{"name":"workflows","total_count":2,"children":[{"name":"graphify.md","total_count":2,"children":[{"name":"Workflow: graphify","total_count":1,"children":[]},{"name":"workflows/graphify.md","total_count":1,"children":[]}]}]}]},{"name":"background.js","total_count":14,"children":[{"name":"broadcastToAll()","total_count":1,"children":[]},{"name":"broadcastToRuntime()","total_count":1,"children":[]},{"name":"cleanupOverlayListeners()","total_count":1,"children":[]},{"name":"clearCaptureState()","total_count":1,"children":[]},{"name":"ensureOffscreenDocument()","total_count":1,"children":[]},{"name":"injectOverlay()","total_count":1,"children":[]},{"name":"isUncapturableUrl()","total_count":1,"children":[]},{"name":"onOverlayTabRemoved()","total_count":1,"children":[]},{"name":"onOverlayTabUpdated()","total_count":1,"children":[]},{"name":"persistCaptureState()","total_count":1,"children":[]},{"name":"removeOverlay()","total_count":1,"children":[]},{"name":"sendToOverlay()","total_count":1,"children":[]},{"name":"startCaptureFlow()","total_count":1,"children":[]},{"name":"waitForOffscreenReady()","total_count":1,"children":[]}]},{"name":"content-overlay.js","total_count":7,"children":[{"name":"applyFontSize()","total_count":1,"children":[]},{"name":"applyOpacity()","total_count":1,"children":[]},{"name":"destroyOverlay()","total_count":1,"children":[]},{"name":"escapeHtml()","total_count":1,"children":[]},{"name":"parseCueText()","total_count":1,"children":[]},{"name":"renderMarkdown()","total_count":1,"children":[]},{"name":"setStatus()","total_count":1,"children":[]}]},{"name":"lib","total_count":4252,"children":[{"name":"file-reader.js","total_count":12,"children":[{"name":"._cp1252ToChar()","total_count":1,"children":[]},{"name":"._decompressDeflateRaw()","total_count":1,"children":[]},{"name":"._docxXmlToText()","total_count":1,"children":[]},{"name":"._extractDocx()","total_count":1,"children":[]},{"name":"._extractPdf()","total_count":1,"children":[]},{"name":"._extractRtf()","total_count":1,"children":[]},{"name":"._inflateEntry()","total_count":1,"children":[]},{"name":"._readZipEntries()","total_count":1,"children":[]},{"name":"._rtfToText()","total_count":1,"children":[]},{"name":".canHandle()","total_count":1,"children":[]},{"name":".extract()","total_count":1,"children":[]},{"name":"FileTextExtractor","total_count":1,"children":[]}]},{"name":"knowledge-sync.js","total_count":8,"children":[{"name":"._doPush()","total_count":1,"children":[]},{"name":"._subscribeToCloud()","total_count":1,"children":[]},{"name":".constructor()","total_count":1,"children":[]},{"name":".pullFromCloud()","total_count":1,"children":[]},{"name":".pushToCloud()","total_count":1,"children":[]},{"name":".startListening()","total_count":1,"children":[]},{"name":".syncOnStartup()","total_count":1,"children":[]},{"name":"KnowledgeSync","total_count":1,"children":[]}]},{"name":"llm-client.js","total_count":7,"children":[{"name":"._buildSystemPrompt()","total_count":1,"children":[]},{"name":"._processStream()","total_count":1,"children":[]},{"name":".abort()","total_count":1,"children":[]},{"name":".constructor()","total_count":1,"children":[]},{"name":".generateCue()","total_count":1,"children":[]},{"name":".setConfig()","total_count":1,"children":[]},{"name":"LLMClient","total_count":1,"children":[]}]},{"name":"pcm-worklet.js","total_count":4,"children":[{"name":"._flush()","total_count":1,"children":[]},{"name":".constructor()","total_count":1,"children":[]},{"name":".process()","total_count":1,"children":[]},{"name":"PCMDownsamplerProcessor","total_count":1,"children":[]}]},{"name":"pdf.min.js","total_count":1144,"children":[{"name":"#de()","total_count":1,"children":[]},{"name":"#ki()","total_count":1,"children":[]},{"name":"#Mi()","total_count":1,"children":[]},{"name":"#pe()","total_count":1,"children":[]},{"name":"#ue()","total_count":1,"children":[]},{"name":"#ye()","total_count":1,"children":[]},{"name":"(+944 more)","total_count":944,"children":[]},{"name":".#$e()","total_count":1,"children":[]},{"name":".#$i()","total_count":1,"children":[]},{"name":".#a()","total_count":1,"children":[]},{"name":".#ae()","total_count":1,"children":[]},{"name":".#ai()","total_count":1,"children":[]},{"name":".#as()","total_count":1,"children":[]},{"name":".#B()","total_count":1,"children":[]},{"name":".#Bt()","total_count":1,"children":[]},{"name":".#ce()","total_count":1,"children":[]},{"name":".#Ci()","total_count":1,"children":[]},{"name":".#cs()","total_count":1,"children":[]},{"name":".#Cs()","total_count":1,"children":[]},{"name":".#De()","total_count":1,"children":[]},{"name":".#ds()","total_count":1,"children":[]},{"name":".#es()","total_count":1,"children":[]},{"name":".#Fs()","total_count":1,"children":[]},{"name":".#G()","total_count":1,"children":[]},{"name":".#Gi()","total_count":1,"children":[]},{"name":".#gs()","total_count":1,"children":[]},{"name":".#Gt()","total_count":1,"children":[]},{"name":".#H()","total_count":1,"children":[]},{"name":".#he()","total_count":1,"children":[]},{"name":".#hi()","total_count":1,"children":[]},{"name":".#hs()","total_count":1,"children":[]},{"name":".#Ht()","total_count":1,"children":[]},{"name":".#ie()","total_count":1,"children":[]},{"name":".#Ie()","total_count":1,"children":[]},{"name":".#is()","total_count":1,"children":[]},{"name":".#It()","total_count":1,"children":[]},{"name":".#j()","total_count":1,"children":[]},{"name":".#Je()","total_count":1,"children":[]},{"name":".#Ji()","total_count":1,"children":[]},{"name":".#jt()","total_count":1,"children":[]},{"name":".#Ke()","total_count":1,"children":[]},{"name":".#Ki()","total_count":1,"children":[]},{"name":".#Ki()","total_count":1,"children":[]},{"name":".#ks()","total_count":1,"children":[]},{"name":".#Le()","total_count":1,"children":[]},{"name":".#ls()","total_count":1,"children":[]},{"name":".#Lt()","total_count":1,"children":[]},{"name":".#m()","total_count":1,"children":[]},{"name":".#ms()","total_count":1,"children":[]},{"name":".#Ms()","total_count":1,"children":[]},{"name":".#n()","total_count":1,"children":[]},{"name":".#N()","total_count":1,"children":[]},{"name":".#ne()","total_count":1,"children":[]},{"name":".#ns()","total_count":1,"children":[]},{"name":".#Nt()","total_count":1,"children":[]},{"name":".#O()","total_count":1,"children":[]},{"name":".#oe()","total_count":1,"children":[]},{"name":".#oi()","total_count":1,"children":[]},{"name":".#os()","total_count":1,"children":[]},{"name":".#Ot()","total_count":1,"children":[]},{"name":".#p()","total_count":1,"children":[]},{"name":".#ps()","total_count":1,"children":[]},{"name":".#Ps()","total_count":1,"children":[]},{"name":".#qe()","total_count":1,"children":[]},{"name":".#qi()","total_count":1,"children":[]},{"name":".#qt()","total_count":1,"children":[]},{"name":".#re()","total_count":1,"children":[]},{"name":".#Re()","total_count":1,"children":[]},{"name":".#rs()","total_count":1,"children":[]},{"name":".#se()","total_count":1,"children":[]},{"name":".#si()","total_count":1,"children":[]},{"name":".#ss()","total_count":1,"children":[]},{"name":".#ti()","total_count":1,"children":[]},{"name":".#ts()","total_count":1,"children":[]},{"name":".#Ts()","total_count":1,"children":[]},{"name":".#U()","total_count":1,"children":[]},{"name":".#us()","total_count":1,"children":[]},{"name":".#Ut()","total_count":1,"children":[]},{"name":".#v()","total_count":1,"children":[]},{"name":".#Ve()","total_count":1,"children":[]},{"name":".#Ve()","total_count":1,"children":[]},{"name":".#Vi()","total_count":1,"children":[]},{"name":".#Vt()","total_count":1,"children":[]},{"name":".#W()","total_count":1,"children":[]},{"name":".#ws()","total_count":1,"children":[]},{"name":".#Wt()","total_count":1,"children":[]},{"name":".#X()","total_count":1,"children":[]},{"name":".#Xe()","total_count":1,"children":[]},{"name":".#Xi()","total_count":1,"children":[]},{"name":".#Ye()","total_count":1,"children":[]},{"name":".#Yi()","total_count":1,"children":[]},{"name":".#Yi()","total_count":1,"children":[]},{"name":".#z()","total_count":1,"children":[]},{"name":".#Z()","total_count":1,"children":[]},{"name":".#Ze()","total_count":1,"children":[]},{"name":".#Zi()","total_count":1,"children":[]},{"name":".#zt()","total_count":1,"children":[]},{"name":"._abortOperatorList()","total_count":1,"children":[]},{"name":"._bindAttachment()","total_count":1,"children":[]},{"name":"._bindJSAction()","total_count":1,"children":[]},{"name":"._bindLink()","total_count":1,"children":[]},{"name":"._bindNamedAction()","total_count":1,"children":[]},{"name":"._bindResetFormAction()","total_count":1,"children":[]},{"name":"._close()","total_count":1,"children":[]},{"name":"._colors()","total_count":1,"children":[]},{"name":"._commonActions()","total_count":1,"children":[]},{"name":"._continue()","total_count":1,"children":[]},{"name":"._createCanvas()","total_count":1,"children":[]},{"name":"._createCanvas()","total_count":1,"children":[]},{"name":"._createCanvas()","total_count":1,"children":[]},{"name":"._createContainer()","total_count":1,"children":[]},{"name":"._createGradient()","total_count":1,"children":[]},{"name":"._createMaskCanvas()","total_count":1,"children":[]},{"name":"._createMeshCanvas()","total_count":1,"children":[]},{"name":"._createPopup()","total_count":1,"children":[]},{"name":"._createQuadrilaterals()","total_count":1,"children":[]},{"name":"._createSVG()","total_count":1,"children":[]},{"name":"._createSVG()","total_count":1,"children":[]},{"name":"._defaultLineColor()","total_count":1,"children":[]},{"name":"._destroy()","total_count":1,"children":[]},{"name":"._dispatchEventFromSandbox()","total_count":1,"children":[]},{"name":"._editOnDoubleClick()","total_count":1,"children":[]},{"name":"._enqueue()","total_count":1,"children":[]},{"name":"._enqueue()","total_count":1,"children":[]},{"name":"._error()","total_count":1,"children":[]},{"name":"._error()","total_count":1,"children":[]},{"name":"._fetchData()","total_count":1,"children":[]},{"name":"._fetchData()","total_count":1,"children":[]},{"name":"._fetchData()","total_count":1,"children":[]},{"name":"._fetchData()","total_count":1,"children":[]},{"name":"._fetchData()","total_count":1,"children":[]},{"name":"._fetchData()","total_count":1,"children":[]},{"name":"._formatContents()","total_count":1,"children":[]},{"name":"._getElementsByName()","total_count":1,"children":[]},{"name":"._getKeyModifier()","total_count":1,"children":[]},{"name":"._getPattern()","total_count":1,"children":[]},{"name":"._hasPopupData()","total_count":1,"children":[]},{"name":"._initialize()","total_count":1,"children":[]},{"name":"._initializeFromPort()","total_count":1,"children":[]},{"name":"._isDraggable()","total_count":1,"children":[]},{"name":"._isSVGFittingCanvas()","total_count":1,"children":[]},{"name":"._keyboardManager()","total_count":1,"children":[]},{"name":"._keyboardManager()","total_count":1,"children":[]},{"name":"._layoutText()","total_count":1,"children":[]},{"name":"._mainThreadWorkerMessageHandler()","total_count":1,"children":[]},{"name":"._next()","total_count":1,"children":[]},{"name":"._onComObjOnMessage()","total_count":1,"children":[]},{"name":"._onDone()","total_count":1,"children":[]},{"name":"._onDone()","total_count":1,"children":[]},{"name":"._onError()","total_count":1,"children":[]},{"name":"._onError()","total_count":1,"children":[]},{"name":"._onHeadersReceived()","total_count":1,"children":[]},{"name":"._onProgress()","total_count":1,"children":[]},{"name":"._onProgress()","total_count":1,"children":[]},{"name":"._processItems()","total_count":1,"children":[]},{"name":"._pumpOperatorList()","total_count":1,"children":[]},{"name":"._render()","total_count":1,"children":[]},{"name":"._renderPageChunk()","total_count":1,"children":[]},{"name":"._scaleImage()","total_count":1,"children":[]},{"name":"._scheduleNext()","total_count":1,"children":[]},{"name":"._setBackgroundColor()","total_count":1,"children":[]},{"name":"._setDefaultPropertiesFromJS()","total_count":1,"children":[]},{"name":"._setEventListener()","total_count":1,"children":[]},{"name":"._setEventListeners()","total_count":1,"children":[]},{"name":"._setParentAndPosition()","total_count":1,"children":[]},{"name":"._setReadableStream()","total_count":1,"children":[]},{"name":"._setReadableStream()","total_count":1,"children":[]},{"name":"._setRequired()","total_count":1,"children":[]},{"name":"._setTextStyle()","total_count":1,"children":[]},{"name":"._setupFakeWorker()","total_count":1,"children":[]},{"name":"._setupFakeWorkerGlobal()","total_count":1,"children":[]},{"name":"._setVisible()","total_count":1,"children":[]},{"name":"._startRenderPage()","total_count":1,"children":[]},{"name":"._translateEmpty()","total_count":1,"children":[]},{"name":".abort()","total_count":1,"children":[]},{"name":".abortRequest()","total_count":1,"children":[]},{"name":".add()","total_count":1,"children":[]},{"name":".add()","total_count":1,"children":[]},{"name":".addAltTextButton()","total_count":1,"children":[]},{"name":".addCommands()","total_count":1,"children":[]},{"name":".addCommands()","total_count":1,"children":[]},{"name":".addCommands()","total_count":1,"children":[]},{"name":".addDeletedAnnotationElement()","total_count":1,"children":[]},{"name":".addEditListeners()","total_count":1,"children":[]},{"name":".addEditor()","total_count":1,"children":[]},{"name":".addEventListener()","total_count":1,"children":[]},{"name":".addFilter()","total_count":1,"children":[]},{"name":".addFilter()","total_count":1,"children":[]},{"name":".addHCMFilter()","total_count":1,"children":[]},{"name":".addHCMFilter()","total_count":1,"children":[]},{"name":".addHighlightArea()","total_count":1,"children":[]},{"name":".addHighlightArea()","total_count":1,"children":[]},{"name":".addHighlightArea()","total_count":1,"children":[]},{"name":".addHighlightArea()","total_count":1,"children":[]},{"name":".addHighlightArea()","total_count":1,"children":[]},{"name":".addHighlightArea()","total_count":1,"children":[]},{"name":".addHighlightArea()","total_count":1,"children":[]},{"name":".addHighlightHCMFilter()","total_count":1,"children":[]},{"name":".addHighlightHCMFilter()","total_count":1,"children":[]},{"name":".addInkEditorIfNeeded()","total_count":1,"children":[]},{"name":".addLayer()","total_count":1,"children":[]}]},{"name":"pdf.worker.min.js","total_count":2689,"children":[{"name":"#a()","total_count":1,"children":[]},{"name":"#E()","total_count":1,"children":[]},{"name":"#N()","total_count":1,"children":[]},{"name":"#R()","total_count":1,"children":[]},{"name":"(+2489 more)","total_count":2489,"children":[]},{"name":".#A()","total_count":1,"children":[]},{"name":".#b()","total_count":1,"children":[]},{"name":".#C()","total_count":1,"children":[]},{"name":".#d()","total_count":1,"children":[]},{"name":".#D()","total_count":1,"children":[]},{"name":".#f()","total_count":1,"children":[]},{"name":".#F()","total_count":1,"children":[]},{"name":".#g()","total_count":1,"children":[]},{"name":".#I()","total_count":1,"children":[]},{"name":".#k()","total_count":1,"children":[]},{"name":".#m()","total_count":1,"children":[]},{"name":".#M()","total_count":1,"children":[]},{"name":".#p()","total_count":1,"children":[]},{"name":".#P()","total_count":1,"children":[]},{"name":".#r()","total_count":1,"children":[]},{"name":".#r()","total_count":1,"children":[]},{"name":".#r()","total_count":1,"children":[]},{"name":".#r()","total_count":1,"children":[]},{"name":".#S()","total_count":1,"children":[]},{"name":".#t()","total_count":1,"children":[]},{"name":".#T()","total_count":1,"children":[]},{"name":".#v()","total_count":1,"children":[]},{"name":".#w()","total_count":1,"children":[]},{"name":".#x()","total_count":1,"children":[]},{"name":".#y()","total_count":1,"children":[]},{"name":".[b]()","total_count":1,"children":[]},{"name":".[f]()","total_count":1,"children":[]},{"name":".[k]()","total_count":1,"children":[]},{"name":".[l]()","total_count":1,"children":[]},{"name":".[m]()","total_count":1,"children":[]},{"name":".[n.$buildXFAObject]()","total_count":1,"children":[]},{"name":".[n.$buildXFAObject]()","total_count":1,"children":[]},{"name":".[n.$buildXFAObject]()","total_count":1,"children":[]},{"name":".[n.$finalize]()","total_count":1,"children":[]},{"name":".[n.$finalize]()","total_count":1,"children":[]},{"name":".[n.$finalize]()","total_count":1,"children":[]},{"name":".[n.$finalize]()","total_count":1,"children":[]},{"name":".[n.$finalize]()","total_count":1,"children":[]},{"name":".[n.$finalize]()","total_count":1,"children":[]},{"name":".[n.$finalize]()","total_count":1,"children":[]},{"name":".[n.$finalize]()","total_count":1,"children":[]},{"name":".[n.$finalize]()","total_count":1,"children":[]},{"name":".[n.$finalize]()","total_count":1,"children":[]},{"name":".[n.$finalize]()","total_count":1,"children":[]},{"name":".[n.$onChild]()","total_count":1,"children":[]},{"name":".[n.$onChild]()","total_count":1,"children":[]},{"name":".[n.$onChildCheck]()","total_count":1,"children":[]},{"name":".[r.$acceptWhitespace]()","total_count":1,"children":[]},{"name":".[r.$acceptWhitespace]()","total_count":1,"children":[]},{"name":".[r.$acceptWhitespace]()","total_count":1,"children":[]},{"name":".[r.$addHTML]()","total_count":1,"children":[]},{"name":".[r.$addHTML]()","total_count":1,"children":[]},{"name":".[r.$addHTML]()","total_count":1,"children":[]},{"name":".[r.$addHTML]()","total_count":1,"children":[]},{"name":".[r.$appendChild]()","total_count":1,"children":[]},{"name":".[r.$buildXFAObject]()","total_count":1,"children":[]},{"name":".[r.$buildXFAObject]()","total_count":1,"children":[]},{"name":".[r.$buildXFAObject]()","total_count":1,"children":[]},{"name":".[r.$buildXFAObject]()","total_count":1,"children":[]},{"name":".[r.$buildXFAObject]()","total_count":1,"children":[]},{"name":".[r.$buildXFAObject]()","total_count":1,"children":[]},{"name":".[r.$buildXFAObject]()","total_count":1,"children":[]},{"name":".[r.$childrenToHTML]()","total_count":1,"children":[]},{"name":".[r.$clean]()","total_count":1,"children":[]},{"name":".[r.$clean]()","total_count":1,"children":[]},{"name":".[r.$clean]()","total_count":1,"children":[]},{"name":".[r.$clean]()","total_count":1,"children":[]},{"name":".[r.$clean]()","total_count":1,"children":[]},{"name":".[r.$clean]()","total_count":1,"children":[]},{"name":".[r.$cleanPage]()","total_count":1,"children":[]},{"name":".[r.$cleanPage]()","total_count":1,"children":[]},{"name":".[r.$clone]()","total_count":1,"children":[]},{"name":".[r.$clone]()","total_count":1,"children":[]},{"name":".[r.$dump]()","total_count":1,"children":[]},{"name":".[r.$dump]()","total_count":1,"children":[]},{"name":".[r.$finalize]()","total_count":1,"children":[]},{"name":".[r.$finalize]()","total_count":1,"children":[]},{"name":".[r.$finalize]()","total_count":1,"children":[]},{"name":".[r.$finalize]()","total_count":1,"children":[]},{"name":".[r.$finalize]()","total_count":1,"children":[]},{"name":".[r.$finalize]()","total_count":1,"children":[]},{"name":".[r.$finalize]()","total_count":1,"children":[]},{"name":".[r.$finalize]()","total_count":1,"children":[]},{"name":".[r.$finalize]()","total_count":1,"children":[]},{"name":".[r.$finalize]()","total_count":1,"children":[]},{"name":".[r.$finalize]()","total_count":1,"children":[]},{"name":".[r.$finalize]()","total_count":1,"children":[]},{"name":".[r.$finalize]()","total_count":1,"children":[]},{"name":".[r.$finalize]()","total_count":1,"children":[]},{"name":".[r.$finalize]()","total_count":1,"children":[]},{"name":".[r.$finalize]()","total_count":1,"children":[]},{"name":".[r.$flushHTML]()","total_count":1,"children":[]},{"name":".[r.$flushHTML]()","total_count":1,"children":[]},{"name":".[r.$flushHTML]()","total_count":1,"children":[]},{"name":".[r.$getAttributeIt]()","total_count":1,"children":[]},{"name":".[r.$getAttributes]()","total_count":1,"children":[]},{"name":".[r.$getAvailableSpace]()","total_count":1,"children":[]},{"name":".[r.$getAvailableSpace]()","total_count":1,"children":[]},{"name":".[r.$getAvailableSpace]()","total_count":1,"children":[]},{"name":".[r.$getAvailableSpace]()","total_count":1,"children":[]},{"name":".[r.$getAvailableSpace]()","total_count":1,"children":[]},{"name":".[r.$getChildren]()","total_count":1,"children":[]},{"name":".[r.$getChildren]()","total_count":1,"children":[]},{"name":".[r.$getChildrenByClass]()","total_count":1,"children":[]},{"name":".[r.$getChildrenByClass]()","total_count":1,"children":[]},{"name":".[r.$getChildrenByName]()","total_count":1,"children":[]},{"name":".[r.$getChildrenByNameIt]()","total_count":1,"children":[]},{"name":".[r.$getChildrenByNameIt]()","total_count":1,"children":[]},{"name":".[r.$getContainedChildren]()","total_count":1,"children":[]},{"name":".[r.$getContainedChildren]()","total_count":1,"children":[]},{"name":".[r.$getContainedChildren]()","total_count":1,"children":[]},{"name":".[r.$getContainedChildren]()","total_count":1,"children":[]},{"name":".[r.$getDataValue]()","total_count":1,"children":[]},{"name":".[r.$getDataValue]()","total_count":1,"children":[]},{"name":".[r.$getExtra]()","total_count":1,"children":[]},{"name":".[r.$getExtra]()","total_count":1,"children":[]},{"name":".[r.$getExtra]()","total_count":1,"children":[]},{"name":".[r.$getExtra]()","total_count":1,"children":[]},{"name":".[r.$getExtra]()","total_count":1,"children":[]},{"name":".[r.$getNextPage]()","total_count":1,"children":[]},{"name":".[r.$getNextPage]()","total_count":1,"children":[]},{"name":".[r.$getParent]()","total_count":1,"children":[]},{"name":".[r.$getParent]()","total_count":1,"children":[]},{"name":".[r.$getRealChildrenByNameIt]()","total_count":1,"children":[]},{"name":".[r.$getSubformParent]()","total_count":1,"children":[]},{"name":".[r.$getSubformParent]()","total_count":1,"children":[]},{"name":".[r.$getSubformParent]()","total_count":1,"children":[]},{"name":".[r.$getTemplateRoot]()","total_count":1,"children":[]},{"name":".[r.$hasSettableValue]()","total_count":1,"children":[]},{"name":".[r.$hasSettableValue]()","total_count":1,"children":[]},{"name":".[r.$hasSettableValue]()","total_count":1,"children":[]},{"name":".[r.$indexOf]()","total_count":1,"children":[]},{"name":".[r.$insertAt]()","total_count":1,"children":[]},{"name":".[r.$isBindable]()","total_count":1,"children":[]},{"name":".[r.$isBindable]()","total_count":1,"children":[]},{"name":".[r.$isBindable]()","total_count":1,"children":[]},{"name":".[r.$isBindable]()","total_count":1,"children":[]},{"name":".[r.$isBindable]()","total_count":1,"children":[]},{"name":".[r.$isBindable]()","total_count":1,"children":[]},{"name":".[r.$isCDATAXml]()","total_count":1,"children":[]},{"name":".[r.$isCDATAXml]()","total_count":1,"children":[]},{"name":".[r.$isDataValue]()","total_count":1,"children":[]},{"name":".[r.$isDataValue]()","total_count":1,"children":[]},{"name":".[r.$isDescendent]()","total_count":1,"children":[]},{"name":".[r.$isDescendent]()","total_count":1,"children":[]},{"name":".[r.$isNsAgnostic]()","total_count":1,"children":[]},{"name":".[r.$isNsAgnostic]()","total_count":1,"children":[]},{"name":".[r.$isSplittable]()","total_count":1,"children":[]},{"name":".[r.$isSplittable]()","total_count":1,"children":[]},{"name":".[r.$isSplittable]()","total_count":1,"children":[]},{"name":".[r.$isSplittable]()","total_count":1,"children":[]},{"name":".[r.$isThereMoreWidth]()","total_count":1,"children":[]},{"name":".[r.$isThereMoreWidth]()","total_count":1,"children":[]},{"name":".[r.$isThereMoreWidth]()","total_count":1,"children":[]},{"name":".[r.$isTransparent]()","total_count":1,"children":[]},{"name":".[r.$isTransparent]()","total_count":1,"children":[]},{"name":".[r.$isTransparent]()","total_count":1,"children":[]},{"name":".[r.$isTransparent]()","total_count":1,"children":[]},{"name":".[r.$isUsable]()","total_count":1,"children":[]},{"name":".[r.$isUsable]()","total_count":1,"children":[]},{"name":".[r.$lastAttribute]()","total_count":1,"children":[]},{"name":".[r.$onChild]()","total_count":1,"children":[]},{"name":".[r.$onChild]()","total_count":1,"children":[]},{"name":".[r.$onChild]()","total_count":1,"children":[]},{"name":".[r.$onChild]()","total_count":1,"children":[]},{"name":".[r.$onChild]()","total_count":1,"children":[]},{"name":".[r.$onChildCheck]()","total_count":1,"children":[]},{"name":".[r.$onText]()","total_count":1,"children":[]},{"name":".[r.$onText]()","total_count":1,"children":[]},{"name":".[r.$onText]()","total_count":1,"children":[]},{"name":".[r.$onText]()","total_count":1,"children":[]},{"name":".[r.$onText]()","total_count":1,"children":[]},{"name":".[r.$popPara]()","total_count":1,"children":[]},{"name":".[r.$pushGlyphs]()","total_count":1,"children":[]},{"name":".[r.$pushGlyphs]()","total_count":1,"children":[]},{"name":".[r.$pushGlyphs]()","total_count":1,"children":[]},{"name":".[r.$pushGlyphs]()","total_count":1,"children":[]},{"name":".[r.$pushGlyphs]()","total_count":1,"children":[]},{"name":".[r.$pushPara]()","total_count":1,"children":[]},{"name":".[r.$removeChild]()","total_count":1,"children":[]},{"name":".[r.$resolvePrototypes]()","total_count":1,"children":[]},{"name":".[r.$searchNode]()","total_count":1,"children":[]},{"name":".[r.$setId]()","total_count":1,"children":[]},{"name":".[r.$setSetAttributes]()","total_count":1,"children":[]},{"name":".[r.$setValue]()","total_count":1,"children":[]},{"name":".[r.$setValue]()","total_count":1,"children":[]},{"name":".[r.$setValue]()","total_count":1,"children":[]},{"name":".[r.$setValue]()","total_count":1,"children":[]},{"name":".[r.$setValue]()","total_count":1,"children":[]},{"name":".[r.$setValue]()","total_count":1,"children":[]},{"name":".[r.$setValue]()","total_count":1,"children":[]},{"name":".[r.$setValue]()","total_count":1,"children":[]},{"name":".[r.$text]()","total_count":1,"children":[]},{"name":".[r.$text]()","total_count":1,"children":[]},{"name":".[r.$text]()","total_count":1,"children":[]},{"name":".[r.$text]()","total_count":1,"children":[]}]},{"name":"session-manager.js","total_count":10,"children":[{"name":"._getToken()","total_count":1,"children":[]},{"name":"._startHeartbeat()","total_count":1,"children":[]},{"name":"._stopHeartbeat()","total_count":1,"children":[]},{"name":".constructor()","total_count":1,"children":[]},{"name":".endSession()","total_count":1,"children":[]},{"name":".formatTime()","total_count":1,"children":[]},{"name":".getAccountStatus()","total_count":1,"children":[]},{"name":".isAuthenticated()","total_count":1,"children":[]},{"name":".startSession()","total_count":1,"children":[]},{"name":"SessionManager","total_count":1,"children":[]}]},{"name":"stt-deepgram.js","total_count":6,"children":[{"name":"._openSocket()","total_count":1,"children":[]},{"name":".connect()","total_count":1,"children":[]},{"name":".constructor()","total_count":1,"children":[]},{"name":".disconnect()","total_count":1,"children":[]},{"name":".sendAudio()","total_count":1,"children":[]},{"name":"DeepgramProvider","total_count":1,"children":[]}]},{"name":"stt-manager.js","total_count":5,"children":[{"name":".connect()","total_count":1,"children":[]},{"name":".constructor()","total_count":1,"children":[]},{"name":".disconnect()","total_count":1,"children":[]},{"name":".sendAudio()","total_count":1,"children":[]},{"name":"STTManager","total_count":1,"children":[]}]},{"name":"supabase-client.js","total_count":2,"children":[{"name":"chromeStorageAdapter","total_count":1,"children":[]},{"name":"supabaseClient","total_count":1,"children":[]}]},{"name":"supabase.min.js","total_count":365,"children":[{"name":"(+165 more)","total_count":165,"children":[]},{"name":"abortSignal()","total_count":1,"children":[]},{"name":"analytics()","total_count":1,"children":[]},{"name":"ar()","total_count":1,"children":[]},{"name":"asStream()","total_count":1,"children":[]},{"name":"At()","total_count":1,"children":[]},{"name":"br()","total_count":1,"children":[]},{"name":"cancelCeremony()","total_count":1,"children":[]},{"name":"catch()","total_count":1,"children":[]},{"name":"ce()","total_count":1,"children":[]},{"name":"channel()","total_count":1,"children":[]},{"name":"cloneDeep()","total_count":1,"children":[]},{"name":"cloneRequestState()","total_count":1,"children":[]},{"name":"connect()","total_count":1,"children":[]},{"name":"connectionState()","total_count":1,"children":[]},{"name":"constructor()","total_count":1,"children":[]},{"name":"containedBy()","total_count":1,"children":[]},{"name":"contains()","total_count":1,"children":[]},{"name":"copy()","total_count":1,"children":[]},{"name":"createBucket()","total_count":1,"children":[]},{"name":"createIndex()","total_count":1,"children":[]},{"name":"createNamespace()","total_count":1,"children":[]},{"name":"createNamespaceIfNotExists()","total_count":1,"children":[]},{"name":"createNewAbortSignal()","total_count":1,"children":[]},{"name":"createSignedUploadUrl()","total_count":1,"children":[]},{"name":"createSignedUrl()","total_count":1,"children":[]},{"name":"createSignedUrls()","total_count":1,"children":[]},{"name":"createTable()","total_count":1,"children":[]},{"name":"createTableIfNotExists()","total_count":1,"children":[]},{"name":"createUser()","total_count":1,"children":[]},{"name":"createWebSocket()","total_count":1,"children":[]},{"name":"csv()","total_count":1,"children":[]},{"name":"decode()","total_count":1,"children":[]},{"name":"delete()","total_count":1,"children":[]},{"name":"deleteBucket()","total_count":1,"children":[]},{"name":"deleteIndex()","total_count":1,"children":[]},{"name":"deleteUser()","total_count":1,"children":[]},{"name":"deleteVectors()","total_count":1,"children":[]},{"name":"destroy()","total_count":1,"children":[]},{"name":"detectEnvironment()","total_count":1,"children":[]},{"name":"disconnect()","total_count":1,"children":[]},{"name":"download()","total_count":1,"children":[]},{"name":"dropNamespace()","total_count":1,"children":[]},{"name":"dropTable()","total_count":1,"children":[]},{"name":"dt()","total_count":1,"children":[]},{"name":"emptyBucket()","total_count":1,"children":[]},{"name":"encode()","total_count":1,"children":[]},{"name":"encodeMetadata()","total_count":1,"children":[]},{"name":"endpointURL()","total_count":1,"children":[]},{"name":"eq()","total_count":1,"children":[]},{"name":"er()","total_count":1,"children":[]},{"name":"exchangeCodeForSession()","total_count":1,"children":[]},{"name":"execute()","total_count":1,"children":[]},{"name":"exists()","total_count":1,"children":[]},{"name":"explain()","total_count":1,"children":[]},{"name":"f()","total_count":1,"children":[]},{"name":"fe()","total_count":1,"children":[]},{"name":"fetchJwk()","total_count":1,"children":[]},{"name":"filter()","total_count":1,"children":[]},{"name":"finally()","total_count":1,"children":[]},{"name":"flushSendBuffer()","total_count":1,"children":[]},{"name":"from()","total_count":1,"children":[]},{"name":"Ft()","total_count":1,"children":[]},{"name":"functions()","total_count":1,"children":[]},{"name":"g()","total_count":1,"children":[]},{"name":"ge()","total_count":1,"children":[]},{"name":"generateLink()","total_count":1,"children":[]},{"name":"geojson()","total_count":1,"children":[]},{"name":"getBucket()","total_count":1,"children":[]},{"name":"getChannels()","total_count":1,"children":[]},{"name":"getClaims()","total_count":1,"children":[]},{"name":"getIndex()","total_count":1,"children":[]},{"name":"getPromise()","total_count":1,"children":[]},{"name":"getPublicUrl()","total_count":1,"children":[]},{"name":"getSession()","total_count":1,"children":[]},{"name":"getUser()","total_count":1,"children":[]},{"name":"getUserById()","total_count":1,"children":[]},{"name":"getUserIdentities()","total_count":1,"children":[]},{"name":"getVectors()","total_count":1,"children":[]},{"name":"getWebSocketConstructor()","total_count":1,"children":[]},{"name":"gr()","total_count":1,"children":[]},{"name":"gt()","total_count":1,"children":[]},{"name":"gte()","total_count":1,"children":[]},{"name":"handleOperation()","total_count":1,"children":[]},{"name":"httpSend()","total_count":1,"children":[]},{"name":"ie()","total_count":1,"children":[]},{"name":"ilike()","total_count":1,"children":[]},{"name":"ilikeAllOf()","total_count":1,"children":[]},{"name":"ilikeAnyOf()","total_count":1,"children":[]},{"name":"in()","total_count":1,"children":[]},{"name":"index()","total_count":1,"children":[]},{"name":"info()","total_count":1,"children":[]},{"name":"initialize()","total_count":1,"children":[]},{"name":"inPendingSyncState()","total_count":1,"children":[]},{"name":"insert()","total_count":1,"children":[]},{"name":"inviteUserByEmail()","total_count":1,"children":[]},{"name":"invoke()","total_count":1,"children":[]},{"name":"ir()","total_count":1,"children":[]},{"name":"is()","total_count":1,"children":[]},{"name":"isAuthenticationTimeout()","total_count":1,"children":[]},{"name":"isConflict()","total_count":1,"children":[]},{"name":"isConnected()","total_count":1,"children":[]},{"name":"isConnecting()","total_count":1,"children":[]},{"name":"isDisconnecting()","total_count":1,"children":[]},{"name":"isDistinct()","total_count":1,"children":[]},{"name":"isEqual()","total_count":1,"children":[]},{"name":"isFilterValueEqual()","total_count":1,"children":[]},{"name":"isNotFound()","total_count":1,"children":[]},{"name":"isThrowOnErrorEnabled()","total_count":1,"children":[]},{"name":"isWebSocketSupported()","total_count":1,"children":[]},{"name":"It()","total_count":1,"children":[]},{"name":"jt()","total_count":1,"children":[]},{"name":"jwks()","total_count":1,"children":[]},{"name":"jwks_cached_at()","total_count":1,"children":[]},{"name":"ke()","total_count":1,"children":[]},{"name":"Kt()","total_count":1,"children":[]},{"name":"like()","total_count":1,"children":[]},{"name":"likeAllOf()","total_count":1,"children":[]},{"name":"likeAnyOf()","total_count":1,"children":[]},{"name":"limit()","total_count":1,"children":[]},{"name":"linkIdentity()","total_count":1,"children":[]},{"name":"linkIdentityIdToken()","total_count":1,"children":[]},{"name":"linkIdentityOAuth()","total_count":1,"children":[]},{"name":"list()","total_count":1,"children":[]},{"name":"listBucketOptionsToQueryString()","total_count":1,"children":[]},{"name":"listBuckets()","total_count":1,"children":[]},{"name":"listIndexes()","total_count":1,"children":[]},{"name":"listNamespaces()","total_count":1,"children":[]},{"name":"listTables()","total_count":1,"children":[]},{"name":"listUsers()","total_count":1,"children":[]},{"name":"listV2()","total_count":1,"children":[]},{"name":"listVectors()","total_count":1,"children":[]},{"name":"loadNamespaceMetadata()","total_count":1,"children":[]},{"name":"loadTable()","total_count":1,"children":[]},{"name":"log()","total_count":1,"children":[]},{"name":"lr()","total_count":1,"children":[]},{"name":"lt()","total_count":1,"children":[]},{"name":"lte()","total_count":1,"children":[]},{"name":"m()","total_count":1,"children":[]},{"name":"map()","total_count":1,"children":[]},{"name":"match()","total_count":1,"children":[]},{"name":"maxAffected()","total_count":1,"children":[]},{"name":"maybeSingle()","total_count":1,"children":[]},{"name":"me()","total_count":1,"children":[]},{"name":"move()","total_count":1,"children":[]},{"name":"Mt()","total_count":1,"children":[]},{"name":"namespaceExists()","total_count":1,"children":[]},{"name":"ne()","total_count":1,"children":[]},{"name":"neq()","total_count":1,"children":[]},{"name":"not()","total_count":1,"children":[]},{"name":"notIn()","total_count":1,"children":[]},{"name":"nt()","total_count":1,"children":[]},{"name":"on()","total_count":1,"children":[]},{"name":"onAuthStateChange()","total_count":1,"children":[]},{"name":"onHeartbeat()","total_count":1,"children":[]},{"name":"onJoin()","total_count":1,"children":[]},{"name":"onLeave()","total_count":1,"children":[]},{"name":"onSync()","total_count":1,"children":[]},{"name":"or()","total_count":1,"children":[]},{"name":"order()","total_count":1,"children":[]},{"name":"Ot()","total_count":1,"children":[]},{"name":"overlaps()","total_count":1,"children":[]},{"name":"overrideTypes()","total_count":1,"children":[]},{"name":"pr()","total_count":1,"children":[]},{"name":"presenceState()","total_count":1,"children":[]},{"name":"Pt()","total_count":1,"children":[]},{"name":"putVectors()","total_count":1,"children":[]},{"name":"Qt()","total_count":1,"children":[]},{"name":"queryVectors()","total_count":1,"children":[]},{"name":"range()","total_count":1,"children":[]},{"name":"rangeAdjacent()","total_count":1,"children":[]},{"name":"rangeGt()","total_count":1,"children":[]},{"name":"rangeGte()","total_count":1,"children":[]},{"name":"rangeLt()","total_count":1,"children":[]},{"name":"rangeLte()","total_count":1,"children":[]},{"name":"reauthenticate()","total_count":1,"children":[]},{"name":"receive()","total_count":1,"children":[]},{"name":"refreshSession()","total_count":1,"children":[]},{"name":"regexIMatch()","total_count":1,"children":[]},{"name":"regexMatch()","total_count":1,"children":[]},{"name":"removeAllChannels()","total_count":1,"children":[]},{"name":"removeChannel()","total_count":1,"children":[]},{"name":"resend()","total_count":1,"children":[]},{"name":"reset()","total_count":1,"children":[]},{"name":"resetPasswordForEmail()","total_count":1,"children":[]},{"name":"returns()","total_count":1,"children":[]},{"name":"rollback()","total_count":1,"children":[]},{"name":"rpc()","total_count":1,"children":[]},{"name":"rr()","total_count":1,"children":[]},{"name":"Rt()","total_count":1,"children":[]},{"name":"scheduleTimeout()","total_count":1,"children":[]},{"name":"schema()","total_count":1,"children":[]},{"name":"se()","total_count":1,"children":[]},{"name":"select()","total_count":1,"children":[]},{"name":"send()","total_count":1,"children":[]},{"name":"sendHeartbeat()","total_count":1,"children":[]},{"name":"setAuth()","total_count":1,"children":[]},{"name":"setHeader()","total_count":1,"children":[]},{"name":"setSession()","total_count":1,"children":[]},{"name":"signInAnonymously()","total_count":1,"children":[]},{"name":"signInWithEthereum()","total_count":1,"children":[]}]}]},{"name":"manifest.json","total_count":76,"children":[{"name":"128","total_count":1,"children":[]},{"name":"128","total_count":1,"children":[]},{"name":"16","total_count":1,"children":[]},{"name":"16","total_count":1,"children":[]},{"name":"48","total_count":1,"children":[]},{"name":"48","total_count":1,"children":[]},{"name":"action","total_count":1,"children":[]},{"name":"activeTab","total_count":1,"children":[]},{"name":"background","total_count":1,"children":[]},{"name":"commands","total_count":1,"children":[]},{"name":"default","total_count":1,"children":[]},{"name":"default_icon","total_count":1,"children":[]},{"name":"default_path","total_count":1,"children":[]},{"name":"description","total_count":1,"children":[]},{"name":"description","total_count":1,"children":[]},{"name":"description","total_count":1,"children":[]},{"name":"host_permissions","total_count":1,"children":[]},{"name":"https://*.8x8.vc/*","total_count":1,"children":[]},{"name":"https://*.around.co/*","total_count":1,"children":[]},{"name":"https://*.bluejeans.com/*","total_count":1,"children":[]},{"name":"https://*.butter.us/*","total_count":1,"children":[]},{"name":"https://*.crowdcast.io/*","total_count":1,"children":[]},{"name":"https://*.daily.co/*","total_count":1,"children":[]},{"name":"https://*.demio.com/*","total_count":1,"children":[]},{"name":"https://*.dialpad.com/*","total_count":1,"children":[]},{"name":"https://*.dingtalk.com/*","total_count":1,"children":[]},{"name":"https://*.feishu.cn/*","total_count":1,"children":[]},{"name":"https://*.gather.town/*","total_count":1,"children":[]},{"name":"https://*.goto.com/*","total_count":1,"children":[]},{"name":"https://*.gotomeeting.com/*","total_count":1,"children":[]},{"name":"https://*.hopin.com/*","total_count":1,"children":[]},{"name":"https://*.larksuite.com/*","total_count":1,"children":[]},{"name":"https://*.livekit.io/*","total_count":1,"children":[]},{"name":"https://*.livestorm.co/*","total_count":1,"children":[]},{"name":"https://*.loom.com/*","total_count":1,"children":[]},{"name":"https://*.pop.com/*","total_count":1,"children":[]},{"name":"https://*.restream.io/*","total_count":1,"children":[]},{"name":"https://*.ringcentral.com/*","total_count":1,"children":[]},{"name":"https://*.riverside.fm/*","total_count":1,"children":[]},{"name":"https://*.streamyard.com/*","total_count":1,"children":[]},{"name":"https://*.supabase.co/*","total_count":1,"children":[]},{"name":"https://*.vonage.com/*","total_count":1,"children":[]},{"name":"https://*.voovmeeting.com/*","total_count":1,"children":[]},{"name":"https://*.vowel.com/*","total_count":1,"children":[]},{"name":"https://*.webex.com/*","total_count":1,"children":[]},{"name":"https://*.zoom.us/*","total_count":1,"children":[]},{"name":"https://app.chime.aws/*","total_count":1,"children":[]},{"name":"https://app.gather.town/*","total_count":1,"children":[]},{"name":"https://app.slack.com/*","total_count":1,"children":[]},{"name":"https://discord.com/*","total_count":1,"children":[]},{"name":"https://meet.google.com/*","total_count":1,"children":[]},{"name":"https://meet.jit.si/*","total_count":1,"children":[]},{"name":"https://openrouter.ai/*","total_count":1,"children":[]},{"name":"https://teams.live.com/*","total_count":1,"children":[]},{"name":"https://teams.microsoft.com/*","total_count":1,"children":[]},{"name":"https://web.skype.com/*","total_count":1,"children":[]},{"name":"https://whereby.com/*","total_count":1,"children":[]},{"name":"icons","total_count":1,"children":[]},{"name":"identity","total_count":1,"children":[]},{"name":"manifest_version","total_count":1,"children":[]},{"name":"name","total_count":1,"children":[]},{"name":"offscreen","total_count":1,"children":[]},{"name":"permissions","total_count":1,"children":[]},{"name":"scripting","total_count":1,"children":[]},{"name":"service_worker","total_count":1,"children":[]},{"name":"side_panel","total_count":1,"children":[]},{"name":"sidePanel","total_count":1,"children":[]},{"name":"start-session","total_count":1,"children":[]},{"name":"storage","total_count":1,"children":[]},{"name":"suggested_key","total_count":1,"children":[]},{"name":"suggested_key","total_count":1,"children":[]},{"name":"tabCapture","total_count":1,"children":[]},{"name":"toggle-pause","total_count":1,"children":[]},{"name":"update_url","total_count":1,"children":[]},{"name":"version","total_count":1,"children":[]},{"name":"web_accessible_resources","total_count":1,"children":[]}]},{"name":"offscreen.js","total_count":24,"children":[{"name":"broadcast()","total_count":1,"children":[]},{"name":"buildAudioGraph()","total_count":1,"children":[]},{"name":"checkForQuestion()","total_count":1,"children":[]},{"name":"detectAndGenerateCue()","total_count":1,"children":[]},{"name":"geminiFileUris","total_count":1,"children":[]},{"name":"getCueDelay()","total_count":1,"children":[]},{"name":"getResponseLength()","total_count":1,"children":[]},{"name":"getResponseStyle()","total_count":1,"children":[]},{"name":"handleClaim()","total_count":1,"children":[]},{"name":"handleStart()","total_count":1,"children":[]},{"name":"handleStop()","total_count":1,"children":[]},{"name":"handleTrackLost()","total_count":1,"children":[]},{"name":"handleTranscript()","total_count":1,"children":[]},{"name":"handleUpdateSettings()","total_count":1,"children":[]},{"name":"isBulletMode()","total_count":1,"children":[]},{"name":"isQuestionsOnly()","total_count":1,"children":[]},{"name":"isStrictContext()","total_count":1,"children":[]},{"name":"isWebGrounding()","total_count":1,"children":[]},{"name":"pendingInterviewerLines","total_count":1,"children":[]},{"name":"reportFatal()","total_count":1,"children":[]},{"name":"setState()","total_count":1,"children":[]},{"name":"settings","total_count":1,"children":[]},{"name":"STATE","total_count":1,"children":[]},{"name":"transcriptLines","total_count":1,"children":[]}]},{"name":"sidepanel.js","total_count":112,"children":[{"name":"._hideAuthMessages()","total_count":1,"children":[]},{"name":"._initTranscriptResize()","total_count":1,"children":[]},{"name":"._loadKnowledgeFromSupabase()","total_count":1,"children":[]},{"name":"._loadTierAndUsage()","total_count":1,"children":[]},{"name":"._reconcilePendingCapture()","total_count":1,"children":[]},{"name":"._removeOrphanedCard()","total_count":1,"children":[]},{"name":"._resetSessionUI()","total_count":1,"children":[]},{"name":"._showAuthError()","total_count":1,"children":[]},{"name":"._showAuthSuccess()","total_count":1,"children":[]},{"name":"._showSmartSignInError()","total_count":1,"children":[]},{"name":"._startSessionInner()","total_count":1,"children":[]},{"name":"._xx_removed_mic_helpers()","total_count":1,"children":[]},{"name":".addTranscriptLine()","total_count":1,"children":[]},{"name":".applyTheme()","total_count":1,"children":[]},{"name":".applyTranscriptVisibility()","total_count":1,"children":[]},{"name":".autoDismiss()","total_count":1,"children":[]},{"name":".bindEvents()","total_count":1,"children":[]},{"name":".bulletMode()","total_count":1,"children":[]},{"name":".checkExistingSession()","total_count":1,"children":[]},{"name":".clearContext()","total_count":1,"children":[]},{"name":".clearSkeletonCard()","total_count":1,"children":[]},{"name":".clearTranscript()","total_count":1,"children":[]},{"name":".collectSettings()","total_count":1,"children":[]},{"name":".constructor()","total_count":1,"children":[]},{"name":".createCueCard()","total_count":1,"children":[]},{"name":".cueDelay()","total_count":1,"children":[]},{"name":".detectPlatform()","total_count":1,"children":[]},{"name":".dismissLanguageReminder()","total_count":1,"children":[]},{"name":".dismissOldCues()","total_count":1,"children":[]},{"name":".dismissTabReminder()","total_count":1,"children":[]},{"name":".downloadTranscript()","total_count":1,"children":[]},{"name":".escapeHtml()","total_count":1,"children":[]},{"name":".fileIcon()","total_count":1,"children":[]},{"name":".formatFileSize()","total_count":1,"children":[]},{"name":".getCaptureInfo()","total_count":1,"children":[]},{"name":".getFullKnowledge()","total_count":1,"children":[]},{"name":".getKnowledgeFilesForUpload()","total_count":1,"children":[]},{"name":".handleCueChunk()","total_count":1,"children":[]},{"name":".handleCueDone()","total_count":1,"children":[]},{"name":".handleCueError()","total_count":1,"children":[]},{"name":".handleCueNoCue()","total_count":1,"children":[]},{"name":".handleCueStart()","total_count":1,"children":[]},{"name":".handleError()","total_count":1,"children":[]},{"name":".handleFiles()","total_count":1,"children":[]},{"name":".hideCapturePrompt()","total_count":1,"children":[]},{"name":".hideReadyToStart()","total_count":1,"children":[]},{"name":".init()","total_count":1,"children":[]},{"name":".initAuth()","total_count":1,"children":[]},{"name":".initSettingsEvents()","total_count":1,"children":[]},{"name":".listenToEngine()","total_count":1,"children":[]},{"name":".loadKnowledgeFiles()","total_count":1,"children":[]},{"name":".loadLastTranscript()","total_count":1,"children":[]},{"name":".loadSettings()","total_count":1,"children":[]},{"name":".loadShortcutDisplay()","total_count":1,"children":[]},{"name":".mergeLines()","total_count":1,"children":[]},{"name":".onSessionEnded()","total_count":1,"children":[]},{"name":".openManageAccount()","total_count":1,"children":[]},{"name":".openUpgradePage()","total_count":1,"children":[]},{"name":".parseCueText()","total_count":1,"children":[]},{"name":".populateSettingsUI()","total_count":1,"children":[]},{"name":".questionsOnly()","total_count":1,"children":[]},{"name":".removeFile()","total_count":1,"children":[]},{"name":".renderAllFiles()","total_count":1,"children":[]},{"name":".renderCueCardText()","total_count":1,"children":[]},{"name":".renderFileItem()","total_count":1,"children":[]},{"name":".renderMarkdown()","total_count":1,"children":[]},{"name":".resetPassword()","total_count":1,"children":[]},{"name":".responseLength()","total_count":1,"children":[]},{"name":".responseStyle()","total_count":1,"children":[]},{"name":".saveContext()","total_count":1,"children":[]},{"name":".saveKnowledgeFiles()","total_count":1,"children":[]},{"name":".saveSessionOnUnexpectedEnd()","total_count":1,"children":[]},{"name":".saveSettings()","total_count":1,"children":[]},{"name":".saveTranscriptLocally()","total_count":1,"children":[]},{"name":".sendTranscript()","total_count":1,"children":[]},{"name":".setStartButtonLoading()","total_count":1,"children":[]},{"name":".setStatus()","total_count":1,"children":[]},{"name":".showCaptureError()","total_count":1,"children":[]},{"name":".showCapturePrompt()","total_count":1,"children":[]},{"name":".showError()","total_count":1,"children":[]},{"name":".showLanguageReminder()","total_count":1,"children":[]},{"name":".showReadyToStart()","total_count":1,"children":[]},{"name":".showSkeletonCard()","total_count":1,"children":[]},{"name":".showTabReminder()","total_count":1,"children":[]},{"name":".showToast()","total_count":1,"children":[]},{"name":".showTranscript()","total_count":1,"children":[]},{"name":".signInWithEmail()","total_count":1,"children":[]},{"name":".signInWithGoogle()","total_count":1,"children":[]},{"name":".signOut()","total_count":1,"children":[]},{"name":".signUpWithEmail()","total_count":1,"children":[]},{"name":".skeletonLoading()","total_count":1,"children":[]},{"name":".speakerLabel()","total_count":1,"children":[]},{"name":".startSession()","total_count":1,"children":[]},{"name":".stopSession()","total_count":1,"children":[]},{"name":".strictContext()","total_count":1,"children":[]},{"name":".switchTab()","total_count":1,"children":[]},{"name":".theme()","total_count":1,"children":[]},{"name":".toggleClearContextBtn()","total_count":1,"children":[]},{"name":".toggleOverlay()","total_count":1,"children":[]},{"name":".togglePause()","total_count":1,"children":[]},{"name":".updateAudioLevel()","total_count":1,"children":[]},{"name":".updateAuthUI()","total_count":1,"children":[]},{"name":".updateAuthUsageDisplay()","total_count":1,"children":[]},{"name":".updateInterimTranscript()","total_count":1,"children":[]},{"name":".updateKnowledgeUsage()","total_count":1,"children":[]},{"name":".updateOverlayButton()","total_count":1,"children":[]},{"name":".updateSessionLocks()","total_count":1,"children":[]},{"name":".updateSliderFill()","total_count":1,"children":[]},{"name":".updateUsageBar()","total_count":1,"children":[]},{"name":".webGrounding()","total_count":1,"children":[]},{"name":"app","total_count":1,"children":[]},{"name":"SideCueApp","total_count":1,"children":[]}]}]};
+
+    function transformData(jsonData) {
+        // Helper function to recursively build the children structure
+        function processNode(node, parentL1StageName) {
+            let displayName = node.name;
+            // Append total_count if it exists and is not already in the name
+            if (node.total_count !== undefined) {
+                if (!/\(Total Count: \d+\)$/.test(displayName)) {
+                    displayName += ` (Total Count: ${node.total_count})`;
+                }
+            }
+
+            const newNode = { name: displayName };
+
+            if (parentL1StageName === "Root") {
+                 newNode.originalStageName = node.name;
+            } else {
+                newNode.originalStageName = parentL1StageName;
+            }
+
+            if (node.children && node.children.length > 0) {
+                const stageNameToPass = (parentL1StageName === "Root") ? node.name : parentL1StageName;
+                newNode.children = node.children.map(child => processNode(child, stageNameToPass));
+            }
+
+            return newNode;
+        }
+
+        let rootDisplayName = jsonData.name;
+        if (jsonData.total_count !== undefined && !/\(Total Count: \d+\)$/.test(rootDisplayName)) {
+            rootDisplayName += ` (Total Count: ${jsonData.total_count})`;
+        }
+
+        return {
+            name: rootDisplayName,
+            originalStageName: "Root",
+            children: (jsonData.children || []).map(child => processNode(child, "Root"))
+        };
+    }
+
+    const treeData = transformData(initialJsonData);
+
+    // Auto-populated phaseColors: every depth-1 child of the root gets
+    // a stable colour from a bigger palette so all top-level dirs are
+    // distinguishable.
+    const PALETTE = [
+      ["#3498DB","#2980B9","#AED6F1"], ["#2ECC71","#27AE60","#A9DFBF"],
+      ["#E74C3C","#C0392B","#F5B7B1"], ["#9B59B6","#8E44AD","#D7BDE2"],
+      ["#F39C12","#D68910","#FAD7A0"], ["#1ABC9C","#117864","#A2D9CE"],
+      ["#34495E","#1B2631","#ABB2B9"], ["#E67E22","#BA4A00","#F5CBA7"],
+      ["#16A085","#0E6655","#A2D9CE"], ["#D35400","#A04000","#EDBB99"],
+      ["#7F8C8D","#566573","#D5DBDB"], ["#C0392B","#7B241C","#F5B7B1"],
+      ["#2E86C1","#1B4F72","#A9CCE3"], ["#28B463","#196F3D","#A9DFBF"],
+      ["#AF7AC5","#6C3483","#D2B4DE"],
+    ];
+    const phaseColors = { "Root": { fill: "#4A4A4A", stroke: "#333333", collapsedFill: "#6C757D" },
+                          "Default": { fill: "#BDC3C7", stroke: "#95A5A6", collapsedFill: "#ECF0F1" } };
+    (initialJsonData.children || []).forEach((c, i) => {
+      const pal = PALETTE[i % PALETTE.length];
+      phaseColors[c.name] = { fill: pal[0], stroke: pal[1], collapsedFill: pal[2] };
+    });
+
+    const levelSpecificPalettes = {
+      0: { fill: "#4A4A4A", stroke: "#333333", collapsedFill: "#6C757D" },
+      2: { fill: "#6ab04c", stroke: "#508a38", collapsedFill: "#a3d391" },
+      3: { fill: "#f0932b", stroke: "#d0730f", collapsedFill: "#f6c07e" },
+      4: { fill: "#be2edd", stroke: "#a01cb3", collapsedFill: "#e08bf2" },
+      5: { fill: "#00a8ff", stroke: "#007ac1", collapsedFill: "#74d2ff" },
+      6: { fill: "#e55039", stroke: "#c23620", collapsedFill: "#f09a8d" },
+      default: { fill: "#747d8c", stroke: "#57606f", collapsedFill: "#a4b0be" }
+    };
+
+    const svgElement = d3.select("#tree-svg");
+    const initialSvgWidth = +svgElement.attr("width");
+    const initialSvgHeight = +svgElement.attr("height");
+    const margin = { top: 40, right: 120, bottom: 80, left: 450 };
+    let width = initialSvgWidth - margin.left - margin.right;
+    let height = initialSvgHeight - margin.top - margin.bottom;
+    const duration = 500;
+    let nodeCounter = 0;
+    const g = svgElement.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+    const treemap = d3.tree().nodeSize([40, 0]);
+    let rootNode = d3.hierarchy(treeData, d => d.children);
+    rootNode.x0 = 0;
+    rootNode.y0 = 0;
+
+    if (rootNode.children) {
+      rootNode.children.forEach(d_child => {
+        if (d_child.children) { collapseBranch(d_child); }
+      });
+    }
+    updateTree(rootNode);
+
+    function collapseBranch(d) { if (d.children) { d._children = d.children; d._children.forEach(collapseBranch); d.children = null; } }
+    function expandBranch(d) { if (d._children) { d.children = d._children; d._children = null; } if (d.children) { d.children.forEach(expandBranch); } }
+    window.expandAll = () => { expandBranch(rootNode); updateTree(rootNode); };
+    window.collapseAll = () => { if (rootNode.children) { rootNode.children.forEach(collapseBranch); } updateTree(rootNode); };
+    window.resetView = () => { if (rootNode.children) { rootNode.children.forEach(d_child => { if (d_child.children || d_child._children) { collapseBranch(d_child); } }); } if (rootNode._children && !rootNode.children) { rootNode.children = rootNode._children; rootNode._children = null; } updateTree(rootNode); };
+
+    function updateTree(source) {
+      const treeLayoutData = treemap(rootNode);
+      let nodes = treeLayoutData.descendants();
+      let links = treeLayoutData.descendants().slice(1);
+
+      let minX = 0;
+      let maxX = 0;
+      if (nodes.length > 0) {
+        minX = d3.min(nodes, d => d.x);
+        maxX = d3.max(nodes, d => d.x);
+      }
+
+      let neededHeight = Math.max(initialSvgHeight, maxX - minX + margin.top + margin.bottom + 100);
+      svgElement.transition().duration(duration / 2).attr("height", neededHeight);
+      g.transition().duration(duration / 2).attr("transform", `translate(${margin.left},${margin.top - minX + 40})`);
+
+      nodes.forEach(d => { d.y = d.depth * 400; }); // Adjust horizontal separation if needed
+
+      const node = g.selectAll('g.node').data(nodes, d => d.id || (d.id = ++nodeCounter));
+      const nodeEnter = node.enter().append('g')
+        .attr('class', d => "node" + (d.children || d._children ? " node--internal" : " node--leaf") + (d._children ? " _children" : ""))
+        .attr('transform', d => `translate(${source.y0},${source.x0})`)
+        .on('click', (event, d) => { if (d.children) { d._children = d.children; d.children = null; } else if (d._children) { d.children = d._children; d._children = null; } updateTree(d); })
+        .style('cursor', d => (d.children || d._children) ? 'pointer' : 'default');
+
+      nodeEnter.append('circle').attr('r', 1e-6);
+
+      nodeEnter.append('text')
+        .attr('dy', '.35em')
+        .attr('x', d => d.children || d._children ? -14 : 14)
+        .attr('text-anchor', d => d.children || d._children ? 'end' : 'start')
+        .style("fill-opacity", 1e-6)
+        .call(wrapText, 380);
+
+      const nodeUpdate = nodeEnter.merge(node);
+      nodeUpdate.transition().duration(duration)
+        .attr('transform', d => `translate(${d.y},${d.x})`)
+        .attr('class', d => "node" + (d.children ? " node--internal" : " node--leaf") + (d._children ? " node--internal _children" : ""));
+
+      nodeUpdate.select('circle').attr('r', 8.5)
+        .style('fill', d => {
+            let palette;
+            if (d.depth === 0) {
+                palette = levelSpecificPalettes[0];
+            } else if (d.depth === 1) {
+                palette = phaseColors[d.data.originalStageName] || phaseColors.Default;
+            } else {
+                palette = levelSpecificPalettes[d.depth] || levelSpecificPalettes.default;
+            }
+            if (d._children) return palette.collapsedFill;
+            if (d.children) return palette.fill;
+            return "#fff";
+        })
+        .style('stroke', d => {
+            let palette;
+            if (d.depth === 0) {
+                palette = levelSpecificPalettes[0];
+            } else if (d.depth === 1) {
+                palette = phaseColors[d.data.originalStageName] || phaseColors.Default;
+            } else {
+                palette = levelSpecificPalettes[d.depth] || levelSpecificPalettes.default;
+            }
+            return palette.stroke;
+        });
+      nodeUpdate.select('text').style("fill-opacity", 1).call(wrapText, 380);
+
+      const nodeExit = node.exit().transition().duration(duration).attr('transform', d => `translate(${source.y},${source.x})`).remove();
+      nodeExit.select('circle').attr('r', 1e-6);
+      nodeExit.select('text').style('fill-opacity', 1e-6);
+
+      const link = g.selectAll('path.link').data(links, d => d.id);
+      const linkEnter = link.enter().insert('path', "g").attr('class', 'link').attr('d', d => { const o = { x: source.x0, y: source.y0 }; return diagonal(o, o); });
+
+      linkEnter.merge(link).transition().duration(duration).attr('d', d => diagonal(d, d.parent))
+        .style('stroke', d => {
+            const sourceNode = d.parent;
+            if (!sourceNode) return phaseColors.Default.stroke;
+            const l1AncestorName = sourceNode.data.originalStageName;
+            const colorPalette = phaseColors[l1AncestorName] || phaseColors.Default;
+            return colorPalette.stroke;
+        });
+      link.exit().transition().duration(duration).attr('d', d => { const o = { x: source.x, y: source.y }; return diagonal(o, o); }).remove();
+      nodes.forEach(d => { d.x0 = d.x; d.y0 = d.y; });
+    }
+
+    function diagonal(s, d) { return `M ${s.y} ${s.x} C ${(s.y + d.y) / 2} ${s.x}, ${(s.y + d.y) / 2} ${d.x}, ${d.y} ${d.x}`; }
+
+    function wrapText(textElements, maxWidth) {
+        const textPartColors = {
+            name: '#343a40',
+            count: '#0056b3'
+        };
+        const countRegex = /(\s\(Total Count: \d+\))$/;
+
+        textElements.each(function () {
+            const textD3 = d3.select(this);
+            const originalNodeText = textD3.datum().data.name;
+            const x = parseFloat(textD3.attr("x") || 0);
+            const initialDy = textD3.attr("dy");
+            const textAnchor = textD3.attr("text-anchor");
+            const lineHeight = 1.1;
+
+            textD3.text(null);
+
+            let namePart = originalNodeText;
+            let countPartText = "";
+
+            const countMatch = originalNodeText.match(countRegex);
+            if (countMatch && originalNodeText.endsWith(countMatch[0])) {
+                namePart = originalNodeText.substring(0, originalNodeText.length - countMatch[0].length).trim();
+                countPartText = countMatch[0].trim();
+            }
+
+            const tokens = [];
+            namePart.split(/\s+/).filter(Boolean).forEach(word => {
+                tokens.push({ text: word, type: 'name' });
+            });
+            if (countPartText) {
+                tokens.push({ text: countPartText, type: 'count' });
+            }
+
+            if (tokens.length === 0 && originalNodeText) {
+                tokens.push({ text: originalNodeText, type: 'name' });
+            }
+
+            let currentTspan = textD3.append("tspan").attr("x", x).attr("dy", initialDy);
+            if (textAnchor === "end") currentTspan.attr("text-anchor", "end");
+
+            let lineTokens = [];
+
+            for (let i = 0; i < tokens.length; i++) {
+                const tokenObj = tokens[i];
+
+                lineTokens.push(tokenObj);
+                currentTspan.text(lineTokens.map(t => t.text).join(" "));
+
+                if (currentTspan.node().getComputedTextLength() > maxWidth && lineTokens.length > 1) {
+                    lineTokens.pop();
+
+                    currentTspan.text(null);
+                    lineTokens.forEach((prevToken, idx) => {
+                        currentTspan.append("tspan")
+                            .text((idx > 0 ? " " : "") + prevToken.text)
+                            .style("fill", textPartColors[prevToken.type] || textPartColors.name)
+                            .style("font-weight", prevToken.type === 'count' ? "bold" : "normal");
+                    });
+
+                    lineTokens = [tokenObj];
+                    currentTspan = textD3.append("tspan").attr("x", x).attr("dy", lineHeight + "em");
+                    if (textAnchor === "end") currentTspan.attr("text-anchor", "end");
+                }
+            }
+
+            currentTspan.text(null);
+            lineTokens.forEach((token, idx) => {
+                currentTspan.append("tspan")
+                    .text((idx > 0 ? " " : "") + token.text)
+                    .style("fill", textPartColors[token.type] || textPartColors.name)
+                    .style("font-weight", token.type === 'count' ? "bold" : "normal");
+            });
+
+            if (textD3.selectAll("tspan > tspan").empty() && textD3.select("tspan").text().length === 0 && originalNodeText) {
+                let t = textD3.select("tspan");
+                let displayText = originalNodeText;
+                t.text(displayText).style("fill", textPartColors.name);
+                if (t.node() && t.node().getComputedTextLength() > maxWidth && displayText.length > 20) {
+                    let estimatedChars = Math.floor(maxWidth / (t.node().getComputedTextLength()/displayText.length) );
+                    displayText = displayText.substring(0, Math.max(0, estimatedChars - 3)) + "...";
+                    t.text(displayText);
+                }
+            }
+        });
+    }
+  </script>
+</body>
+</html>

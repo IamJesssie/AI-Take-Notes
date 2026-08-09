@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-Take-Notes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=block">
+  <link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+
+  <!-- ═══════════════ TOP BAR ═══════════════ -->
+  <header id="header">
+    <div class="header-left">
+      <span id="status-badge" class="badge badge-idle">
+        <span class="badge-dot"></span>
+        Idle
+      </span>
+    </div>
+    <div class="header-right">
+    </div>
+  </header>
+
+  <!-- ═══════════════ TAB BAR ═══════════════ -->
+  <nav id="tab-bar">
+    <button class="tab active" data-tab="cues">
+      <span class="material-symbols-outlined">quick_reference_all</span>
+      Cues
+    </button>
+    <button class="tab" data-tab="knowledge">
+      <span class="material-symbols-outlined">description</span>
+      Knowledge
+    </button>
+    <button class="tab" data-tab="summary">
+      <span class="material-symbols-outlined">summarize</span>
+      Summary
+    </button>
+    <button class="tab" data-tab="settings">
+      <span class="material-symbols-outlined">settings</span>
+      Settings
+    </button>
+  </nav>
+
+  <!-- ═══════════════ TAB: CUES ═══════════════ -->
+  <div id="tab-cues" class="tab-content active">
+
+    <!-- ── Controls ── -->
+    <section id="controls">
+      <div class="controls-row">
+        <button id="btn-start" class="btn btn-primary btn-compact" style="display:none;">
+          <span class="material-symbols-outlined">play_circle</span>
+          Start
+        </button>
+        <button id="btn-pause" class="btn btn-outline btn-compact" style="display:none;">
+        <span class="material-symbols-outlined">pause</span>
+        Pause
+        </button>
+      <button id="btn-stop" class="btn btn-danger btn-compact" style="display:none;">
+        <span class="material-symbols-outlined">stop_circle</span>
+        Stop
+      </button>
+        <button id="btn-overlay" class="icon-btn icon-btn-controls" title="Toggle floating overlay">
+          <span class="material-symbols-outlined">picture_in_picture_alt</span>
+        </button>
+      </div>
+      <div id="capture-info" style="display:none;">
+        <span class="material-symbols-outlined" style="font-size:14px;">tab</span>
+        <span id="capture-tab-name">—</span>
+      </div>
+      <div id="audio-levels" style="display:none;">
+        <div class="level-bar">
+          <span class="material-symbols-outlined level-icon">tab</span>
+          <span class="level-label">Tab</span>
+          <div class="level-track"><div id="level-tab" class="level-fill"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Cue Cards ── -->
+    <section id="cue-area">
+      <!-- ── Notification Overlays ── -->
+      <div id="notification-overlays">
+        <div id="lang-reminder" class="reminder-overlay" style="display:none;">
+          <div class="reminder-content">
+            <span class="material-symbols-outlined reminder-icon">translate</span>
+            <div class="reminder-text">
+              <strong>Check your speech language</strong>
+              <p>AI-Take-Notes works best when the language setting matches the language spoken in your conversation. Mismatched language causes poor transcription and missed cues.</p>
+              <p class="reminder-current">Currently set to: <span id="lang-reminder-current">English</span></p>
+            </div>
+          </div>
+          <div class="reminder-actions">
+            <button id="lang-reminder-change" class="reminder-btn reminder-btn-primary">Change</button>
+            <button id="lang-reminder-dismiss" class="reminder-btn">Dismiss</button>
+            <button id="lang-reminder-never" class="reminder-btn reminder-btn-muted">Don't show</button>
+          </div>
+        </div>
+
+        <div id="tab-reminder" class="reminder-overlay" style="display:none;">
+          <div class="reminder-content">
+            <span class="material-symbols-outlined reminder-icon">language</span>
+            <div class="reminder-text">
+              <strong>Works with meetings in Chrome tabs</strong>
+              <p>AI-Take-Notes captures audio from browser tabs. Join your meeting in Chrome — Google Meet, Zoom, Microsoft Teams, and more are all supported.</p>
+            </div>
+          </div>
+          <div class="reminder-actions">
+            <button id="tab-reminder-instructions" class="reminder-btn reminder-btn-primary">Instructions</button>
+            <button id="tab-reminder-dismiss" class="reminder-btn">Dismiss</button>
+            <button id="tab-reminder-never" class="reminder-btn reminder-btn-muted">Don't show</button>
+          </div>
+        </div>
+      </div>
+      <div id="cue-cards">
+        <div class="cue-card cue-placeholder">
+          <img id="placeholder-logo" class="placeholder-app-icon" alt="AI-Take-Notes" width="56" height="56">
+          <p><strong>Open your meeting tab</strong> (Google Meet, Zoom, Teams…) and click the <strong>AI-Take-Notes icon</strong> in your Chrome toolbar to start.</p>
+          <p class="capture-prompt-sub">Or press <kbd>Alt+S</kbd> while on the meeting tab.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Live Transcript ── -->
+    <section id="transcript-area">
+      <div id="transcript-resize-handle" class="transcript-resize-handle">
+        <div class="resize-grip"></div>
+      </div>
+      <div class="section-header">
+        <h2>
+          <span class="material-symbols-outlined section-icon">subtitles</span>
+          Transcript
+        </h2>
+        <div class="section-header-actions">
+          <input type="file" id="input-import-transcript" accept=".txt,.json,.srt,.vtt,.mp3,.wav,.m4a,.webm,.ogg" style="display:none;">
+          <button id="btn-import-transcript" class="icon-btn icon-btn-sm" title="Import transcript (Audio or TXT)">
+            <span class="material-symbols-outlined" style="font-size:16px;">upload</span>
+          </button>
+          <button id="btn-download-transcript" class="icon-btn icon-btn-sm" title="Download transcript (.txt)" style="display: none;">
+            <span class="material-symbols-outlined" style="font-size:16px;">description</span>
+          </button>
+          <button id="btn-download-pdf" class="icon-btn icon-btn-sm" title="Download transcript (.pdf)" style="display: none;">
+            <span class="material-symbols-outlined" style="font-size:16px;">picture_as_pdf</span>
+          </button>
+          <button id="btn-toggle-transcript" class="icon-btn icon-btn-sm" title="Minimize transcript">
+            <span class="material-symbols-outlined" style="font-size:16px;">expand_more</span>
+          </button>
+        </div>
+      </div>
+      <div id="transcript">
+        <p class="transcript-placeholder">Conversation will appear here...</p>
+      </div>
+      <div id="copilot-suggestions" class="copilot-suggestions-container" style="display:none;">
+        <div class="suggestions-header">
+          <span class="material-symbols-outlined" style="font-size:16px;">lightbulb</span>
+          <span>AI Copilot Suggestions</span>
+          <button id="btn-refresh-suggestions" class="icon-btn icon-btn-sm" title="Refresh suggestions">
+            <span class="material-symbols-outlined" style="font-size:16px;">refresh</span>
+          </button>
+        </div>
+        <div id="suggestions-list" class="suggestions-list">
+          <!-- Suggestions will be generated here -->
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ═══════════════ TAB: KNOWLEDGE ═══════════════ -->
+  <div id="tab-knowledge" class="tab-content">
+
+    <section id="context-area">
+      <textarea id="user-context" placeholder="Paste your resume, job description, project notes, or anything you want AI-Take-Notes to reference when generating answer cues..." maxlength="20000"></textarea>
+      <div class="context-actions">
+        <button id="btn-clear-context" class="btn btn-sm btn-sm-danger" style="display:none;">
+          <span class="material-symbols-outlined" style="font-size:14px;">delete_sweep</span>
+          Clear
+        </button>
+        <button id="btn-save-context" class="btn btn-sm">
+          <span class="material-symbols-outlined" style="font-size:14px;">save</span>
+          Save
+        </button>
+      </div>
+
+      <!-- File Uploads -->
+      <div id="knowledge-files">
+        <div id="file-drop-zone">
+          <span class="material-symbols-outlined" style="font-size:20px;">upload_file</span>
+          <span>Drop files or <label for="file-input" class="file-browse-link">browse</label> — select multiple</span>
+          <span class="file-formats">.txt .md .docx .rtf .pdf — max 10 files</span>
+          <input type="file" id="file-input" multiple accept=".txt,.md,.markdown,.docx,.rtf,.pdf" hidden>
+        </div>
+        <div id="file-list"></div>
+      </div>
+
+      <!-- Knowledge usage bar -->
+      <div id="knowledge-usage">
+        <div class="usage-bar">
+          <div id="usage-fill" class="usage-fill"></div>
+        </div>
+        <span id="usage-label" class="usage-label">0 / 20,000 chars</span>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ═══════════════ TAB: SUMMARY ═══════════════ -->
+  <div id="tab-summary" class="tab-content">
+    <section class="summary-controls" style="padding: 16px; border-bottom: 1px solid var(--border-color);">
+      <button id="btn-generate-summary" class="btn btn-primary">
+        <span class="material-symbols-outlined">auto_awesome</span>
+        Generate Summary
+      </button>
+    </section>
+    <section id="summary-area" style="padding: 16px; display: none;">
+      <div class="summary-actions" style="margin-bottom: 12px; display: flex; gap: 8px; justify-content: flex-end;">
+        <button id="btn-copy-summary" class="btn btn-sm btn-outline">
+          <span class="material-symbols-outlined" style="font-size:14px;">content_copy</span>
+          Copy
+        </button>
+        <button id="btn-export-summary" class="btn btn-sm btn-outline">
+          <span class="material-symbols-outlined" style="font-size:14px;">download</span>
+          Export
+        </button>
+      </div>
+      <div id="summary-content" class="markdown-body" style="white-space: pre-wrap;">
+      </div>
+    </section>
+  </div>
+
+  <!-- ═══════════════ TAB: SETTINGS ═══════════════ -->
+  <div id="tab-settings" class="tab-content">
+
+    <div class="settings-body">
+
+      <!-- ═══ API Keys (Standalone Mode) ═══ -->
+      <details class="settings-accordion" open>
+        <summary class="settings-section-title">
+          <span class="material-symbols-outlined" style="font-size:16px;">key</span>
+          Standalone API Keys
+        </summary>
+        <div class="settings-section-content">
+          <div class="field">
+            <label>
+              <span class="material-symbols-outlined field-icon">mic</span>
+              Deepgram API Key
+            </label>
+            <input type="password" id="setting-deepgram-key" placeholder="Enter Deepgram Key" style="font-family:inherit;">
+            <p class="help-text">Used for real-time speech-to-text. Get one for free at deepgram.com</p>
+          </div>
+          <div class="field">
+            <label>
+              <span class="material-symbols-outlined field-icon">smart_toy</span>
+              OpenRouter API Key
+            </label>
+            <input type="password" id="setting-openrouter-key" placeholder="Enter OpenRouter Key" style="font-family:inherit;">
+            <p class="help-text">Used for cue generation. Free models available at openrouter.ai</p>
+          </div>
+          <div class="field">
+            <label>
+              <span class="material-symbols-outlined field-icon">model_training</span>
+              OpenRouter Model
+            </label>
+            <input type="text" id="setting-openrouter-model" placeholder="e.g. google/gemini-2.0-flash-lite-preview-02-05:free" value="google/gemini-2.0-flash-lite-preview-02-05:free" style="font-family:inherit;">
+            <p class="help-text">The model ID to use for generating cues.</p>
+          </div>
+        </div>
+      </details>
+
+      <!-- ═══ Display ═══ -->
+      <details class="settings-accordion">
+        <summary class="settings-section-title">
+          <span class="material-symbols-outlined" style="font-size:16px;">palette</span>
+          Display
+        </summary>
+        <div class="settings-section-content">
+          <div class="field">
+            <label>
+              <span class="material-symbols-outlined field-icon">dark_mode</span>
+              Theme
+            </label>
+            <select id="setting-theme">
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </div>
+          <div class="field field-toggle">
+            <label>
+              <span class="material-symbols-outlined field-icon">skeleton</span>
+              Skeleton loading
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="setting-skeleton-loading">
+              <span class="toggle-slider"></span>
+            </label>
+            <p class="help-text">Show animated skeleton placeholder while generating cues</p>
+          </div>
+        </div>
+      </details>
+
+      <!-- ═══ Keyboard Shortcuts ═══ -->
+      <details class="settings-accordion">
+        <summary class="settings-section-title">
+          <span class="material-symbols-outlined" style="font-size:16px;">keyboard</span>
+          Keyboard Shortcuts
+        </summary>
+        <div class="settings-section-content">
+          <p class="help-text" style="margin: 0 0 12px 0;">AI-Take-Notes is started by clicking the toolbar icon on your meeting tab. The keyboard shortcut below does the same thing without leaving the keyboard.</p>
+          <div class="field field-shortcut">
+            <label>
+              <span class="material-symbols-outlined field-icon">play_circle</span>
+              Start session (on meeting tab)
+            </label>
+            <a href="#" class="shortcut-link link-chrome-shortcuts" title="Click to change in Chrome settings">
+              <kbd id="shortcut-start-key">Alt+S</kbd>
+              <span class="material-symbols-outlined shortcut-edit-icon">edit</span>
+            </a>
+          </div>
+          <div class="field field-shortcut">
+            <label>
+              <span class="material-symbols-outlined field-icon">pause_circle</span>
+              Pause / Resume
+            </label>
+            <a href="#" id="link-chrome-shortcuts" class="shortcut-link link-chrome-shortcuts" title="Click to change in Chrome settings">
+              <kbd id="shortcut-pause-key">Alt+P</kbd>
+              <span class="material-symbols-outlined shortcut-edit-icon">edit</span>
+            </a>
+          </div>
+        </div>
+      </details>
+
+      <!-- ═══ Persona & Prompt ═══ -->
+      <details class="settings-accordion">
+        <summary class="settings-section-title">
+          <span class="material-symbols-outlined" style="font-size:16px;">person_search</span>
+          Persona & Prompt
+        </summary>
+        <div class="settings-section-content">
+          <div class="field">
+            <label>
+              <span class="material-symbols-outlined field-icon">face</span>
+              Persona
+            </label>
+            <select id="setting-persona">
+              <option value="executive">Executive Assistant</option>
+              <option value="interviewer">Tech Interviewer</option>
+              <option value="sales">Sales Lead</option>
+              <option value="student">Student Note-Taker</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+          <div class="field" id="custom-prompt-field">
+            <label>
+              <span class="material-symbols-outlined field-icon">edit_note</span>
+              Custom System Prompt
+            </label>
+            <textarea id="setting-system-prompt" rows="4" placeholder="Enter custom instructions for how the AI should act..." style="font-family:inherit; resize: vertical; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary);"></textarea>
+            <p class="help-text">Used to guide cue generation and summaries.</p>
+          </div>
+        </div>
+      </details>
+
+      <!-- ═══ Cues & Transcript ═══ -->
+      <details class="settings-accordion">
+        <summary class="settings-section-title">
+          <span class="material-symbols-outlined" style="font-size:16px;">quick_reference_all</span>
+          Cues
+        </summary>
+        <div class="settings-section-content">
+          <div class="field field-toggle">
+            <label>
+              <span class="material-symbols-outlined field-icon">help</span>
+              Questions only
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="setting-questions-only" checked>
+              <span class="toggle-slider"></span>
+            </label>
+            <p class="help-text">When on, cues are generated only for direct questions. When off, cues also cover general topics and statements.</p>
+          </div>
+          <div class="field">
+            <label>
+              <span class="material-symbols-outlined field-icon">style</span>
+              Response style
+            </label>
+            <div class="style-slider-group">
+              <div class="md3-slider">
+                <input type="range" id="setting-response-style" min="1" max="5" step="1" value="3">
+                <div class="md3-slider-ticks"><span></span><span></span><span></span><span></span><span></span></div>
+              </div>
+              <div class="style-labels">
+                <span>Casual</span>
+                <span>Friendly</span>
+                <span>Balanced</span>
+                <span>Professional</span>
+                <span>Executive</span>
+              </div>
+            </div>
+            <p class="help-text slider-description" id="style-description">Natural and polished — works for most interviews</p>
+          </div>
+          <div class="field">
+            <label>
+              <span class="material-symbols-outlined field-icon">straighten</span>
+              Response length
+            </label>
+            <div class="style-slider-group">
+              <div class="md3-slider">
+                <input type="range" id="setting-response-length" min="1" max="3" step="1" value="2">
+                <div class="md3-slider-ticks"><span></span><span></span><span></span></div>
+              </div>
+              <div class="style-labels">
+                <span>Brief</span>
+                <span>Balanced</span>
+                <span>Detailed</span>
+              </div>
+            </div>
+            <p class="help-text slider-description" id="length-description">Moderate depth — covers key points with supporting detail</p>
+          </div>
+          <div class="field">
+            <label>
+              <span class="material-symbols-outlined field-icon">hourglass_top</span>
+              Silence threshold
+            </label>
+            <div class="range-group">
+              <div class="md3-slider">
+                <input type="range" id="setting-cue-delay" min="1.5" max="8" step="0.5" value="2.5">
+              </div>
+              <span id="cue-delay-value" class="range-value">2.5s</span>
+            </div>
+            <p class="help-text">How many seconds of silence before considering the question finished. Increase for interviewers who pause mid-thought.</p>
+          </div>
+          <div class="field field-toggle">
+            <label>
+              <span class="material-symbols-outlined field-icon">auto_delete</span>
+              Auto-dismiss cues
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="setting-auto-dismiss">
+              <span class="toggle-slider"></span>
+            </label>
+            <p class="help-text">Fade out old cue when a new one arrives</p>
+          </div>
+          <div class="field field-toggle">
+            <label>
+              <span class="material-symbols-outlined field-icon">target</span>
+              Stick to my knowledge
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="setting-strict-context">
+              <span class="toggle-slider"></span>
+            </label>
+            <p class="help-text">Only use information from your Knowledge tab. Reduces creative fills and hallucination — best when you've provided detailed context.</p>
+          </div>
+          <div class="field field-toggle">
+            <label>
+              <span class="material-symbols-outlined field-icon">format_list_bulleted</span>
+              Bullet points mode
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="setting-bullet-mode">
+              <span class="toggle-slider"></span>
+            </label>
+            <p class="help-text">Show concise key talking points instead of full answer text. Easier to scan at a glance during fast-paced conversations.</p>
+          </div>
+          <div class="field field-toggle">
+            <label>
+              <span class="material-symbols-outlined field-icon">travel_explore</span>
+              Web grounding
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="setting-web-grounding">
+              <span class="toggle-slider"></span>
+            </label>
+            <p class="help-text">Let the AI search the web for richer, more accurate answers. May add slight latency.</p>
+          </div>
+
+          <!-- Transcript settings -->
+          <div class="settings-sub-divider"></div>
+          <div class="field field-toggle">
+            <label>
+              <span class="material-symbols-outlined field-icon">visibility</span>
+              Show transcript
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="setting-show-transcript" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="field">
+            <label>
+              <span class="material-symbols-outlined field-icon">person</span>
+              Interviewer label
+            </label>
+            <input type="text" id="setting-speaker-label" placeholder="SPEAKER" maxlength="16" style="font-family:inherit;">
+            <p class="help-text">Custom label for the other speaker (e.g. Interviewer, Sarah, HR)</p>
+          </div>
+          <div class="field field-toggle">
+            <label>
+              <span class="material-symbols-outlined field-icon">merge</span>
+              Merge lines
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="setting-merge-lines" checked>
+              <span class="toggle-slider"></span>
+            </label>
+            <p class="help-text">Combines consecutive lines from the same speaker into one block</p>
+          </div>
+        </div>
+      </details>
+
+      <!-- ═══ Speech ═══ -->
+      <details class="settings-accordion" id="accordion-language">
+        <summary class="settings-section-title">
+          <span class="material-symbols-outlined" style="font-size:16px;">translate</span>
+          Language
+        </summary>
+        <div class="settings-section-content">
+          <div class="field">
+            <label>
+              <span class="material-symbols-outlined field-icon">language</span>
+              Speech language
+            </label>
+            <select id="stt-language">
+              <option value="en">English</option>
+              <option value="es">Spanish</option>
+              <option value="fr">French</option>
+              <option value="de">German</option>
+              <option value="it">Italian</option>
+              <option value="pt">Portuguese</option>
+              <option value="nl">Dutch</option>
+              <option value="pl">Polish</option>
+              <option value="uk">Ukrainian</option>
+              <option value="ru">Russian</option>
+              <option value="ja">Japanese</option>
+              <option value="ko">Korean</option>
+              <option value="zh">Chinese</option>
+              <option value="hi">Hindi</option>
+              <option value="ar">Arabic</option>
+              <option value="tr">Turkish</option>
+              <option value="sv">Swedish</option>
+              <option value="da">Danish</option>
+              <option value="no">Norwegian</option>
+              <option value="fi">Finnish</option>
+            </select>
+            <p class="help-text">Select the language spoken in your interview.</p>
+          </div>
+        </div>
+      </details>
+
+
+
+    </div>
+
+    <div class="settings-footer">
+      <a href="https://www.sidecue.app" target="_blank">AI-Take-Notes</a>
+      <span class="settings-footer-dot">·</span>
+      <a href="https://www.sidecue.app/privacy" target="_blank">Privacy Policy</a>
+      <span class="settings-footer-dot">·</span>
+      <a href="https://www.sidecue.app/terms" target="_blank">Terms of Use</a>
+    </div>
+
+  </div>
+
+  <script src="lib/pdf.min.js"></script>
+  <script src="lib/knowledge-sync.js"></script>
+  <script src="lib/session-manager.js"></script>
+  <script src="lib/file-reader.js"></script>
+  <script src="sidepanel.js"></script>
+</body>
+</html>
