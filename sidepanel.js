@@ -50,17 +50,6 @@ class SideCueApp {
       btnImportTranscript: document.getElementById('btn-import-transcript'),
       inputImportTranscript: document.getElementById('input-import-transcript'),
       btnDownloadPdf: document.getElementById('btn-download-pdf'),
-
-      // New DOM refs
-      btnGenerateSummary: document.getElementById('btn-generate-summary'),
-      btnCopySummary: document.getElementById('btn-copy-summary'),
-      btnExportSummary: document.getElementById('btn-export-summary'),
-      summaryContent: document.getElementById('summary-content'),
-      summaryArea: document.getElementById('summary-area'),
-      
-      btnRefreshSuggestions: document.getElementById('btn-refresh-suggestions'),
-      suggestionsList: document.getElementById('suggestions-list'),
-      copilotSuggestions: document.getElementById('copilot-suggestions'),
     };
 
     this.init();
