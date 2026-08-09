@@ -1,12 +1,12 @@
 {
   "background.js": {
-    "mtime": 1782972495.198496,
-    "ast_hash": "aa6e2bea6957da1f64ef27fb3f930b9e",
+    "mtime": 1786292851.3113723,
+    "ast_hash": "3a4b78b7fc6521a6ca5e2ca92040d21b",
     "semantic_hash": ""
   },
   "content-overlay.js": {
-    "mtime": 1781187259.019616,
-    "ast_hash": "df40cd922a68e49a85895c780a45028f",
+    "mtime": 1786292877.883394,
+    "ast_hash": "4ed665d324406cea0d679873a89de8c6",
     "semantic_hash": ""
   },
   "lib/file-reader.js": {
@@ -65,18 +65,18 @@
     "semantic_hash": ""
   },
   "manifest.json": {
-    "mtime": 1781188473.0730376,
-    "ast_hash": "20cfd645476bbd4e8485baccef8f4255",
+    "mtime": 1786292817.9382982,
+    "ast_hash": "d93bb8de704c00271938373c5f4bd2cd",
     "semantic_hash": ""
   },
   "offscreen.js": {
-    "mtime": 1781188445.180417,
-    "ast_hash": "bc347583f581dedfdcf7a5fa62cbe4c7",
+    "mtime": 1786292859.3992524,
+    "ast_hash": "5df58074c6b6a553f652c4c73fffc49d",
     "semantic_hash": ""
   },
   "sidepanel.js": {
-    "mtime": 1783661598.7543097,
-    "ast_hash": "6637badd9c5faa594c5f7563c49be918",
+    "mtime": 1786292984.2019844,
+    "ast_hash": "5cea3b83a9bc5d35c7ec0b96e1bfd414",
     "semantic_hash": ""
   },
   ".agents/rules/graphify.md": {
@@ -100,8 +100,8 @@
     "semantic_hash": ""
   },
   "sidepanel.html": {
-    "mtime": 1786290885.2650933,
-    "ast_hash": "c98b25a69fe49579b3bdf627562dd4f1",
+    "mtime": 1786292927.3822837,
+    "ast_hash": "a3af033fbc9a43c3491ed08e260c3765",
     "semantic_hash": ""
   },
   "icons/icon128.png": {
@@ -122,6 +122,11 @@
   "logo/sidecue_logo_big.png": {
     "mtime": 1781187258.932386,
     "ast_hash": "8ccbb8c20b70069711105d484fd1e454",
+    "semantic_hash": ""
+  },
+  "README.md": {
+    "mtime": 1786292727.691625,
+    "ast_hash": "479dc6d7bf607161af74a3cb7a314581",
     "semantic_hash": ""
   }
 }

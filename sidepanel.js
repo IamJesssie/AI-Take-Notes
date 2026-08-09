@@ -167,27 +167,15 @@ class SideCueApp {
     if (btnImport && inputImport) {
       btnImport.addEventListener('click', () => inputImport.click());
       inputImport.addEventListener('change', (e) => {
-        if (e.target.files.length > 0) {
-          this.handleTranscriptImport(e.target.files[0]);
+        if (e.target.files && e.target.files[0]) {
+          this.importTranscriptFile(e.target.files[0]);
           e.target.value = '';
         }
       });
     }
     
     if (btnDownloadPdf) {
-      btnDownloadPdf.addEventListener('click', () => this.downloadPdf());
-    }
-    if (this.els.btnDownloadPdf) {
-      this.els.btnDownloadPdf.addEventListener('click', () => this.downloadPdfTranscript());
-    }
-    if (this.els.btnImportTranscript && this.els.inputImportTranscript) {
-      this.els.btnImportTranscript.addEventListener('click', () => this.els.inputImportTranscript.click());
-      this.els.inputImportTranscript.addEventListener('change', (e) => {
-        if (e.target.files && e.target.files[0]) {
-          this.importTranscriptFile(e.target.files[0]);
-          e.target.value = '';
-        }
-      });
+      btnDownloadPdf.addEventListener('click', () => this.downloadPdfTranscript());
     }
 
     // Summary events
@@ -472,7 +460,8 @@ class SideCueApp {
     
     // Make sure transcript container is visible
     if (this.els.btnDownloadTranscript) this.els.btnDownloadTranscript.style.display = 'flex';
-    if (this.els.btnDownloadPdf) this.els.btnDownloadPdf.style.display = 'flex';
+    const btnPdf = document.getElementById('btn-download-pdf');
+    if (btnPdf) btnPdf.style.display = 'flex';
 
     // Remove placeholder if present
     const placeholder = this.els.transcript.querySelector('.transcript-placeholder');
