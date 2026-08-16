@@ -311,6 +311,131 @@
     }
   });
 
+  // ─── In-Page Caption & Speaker Scraper ────────
+  let lastCapturedCaption = '';
+  let captionObserver = null;
+
+  const UI_NOISE_BLACKLIST = [
+    'preview', 'captions are on', 'closed captioning is available',
+    'turn on captions', 'turn off captions', 'show captions', 'hide captions',
+    'show transcript', 'hide transcript', 'mute all', 'unmute',
+    'start video', 'stop video', 'sidecue', 'ask tactiq ai'
+  ];
+
+  function isUiNoise(text) {
+    if (!text) return true;
+    const lower = text.trim().toLowerCase();
+    if (lower.length < 2) return true;
+    return UI_NOISE_BLACKLIST.some(b => lower === b || lower.startsWith(b + ' ') || lower.endsWith(' ' + b));
+  }
+
+  function detectActiveSpeakerName() {
+    try {
+      const zoomNode = document.querySelector(`
+        .active-speaker .name-label,
+        [class*="active-speaker"] [class*="name"],
+        .video-avatar__avatar-name,
+        .participants-item__name,
+        [class*="speaker-name"],
+        .zm-voice-active-speaker
+      `);
+      if (zoomNode && zoomNode.innerText && zoomNode.innerText.trim()) {
+        const name = zoomNode.innerText.trim().replace(/\s*\(Me\)\s*/i, '').trim();
+        if (name && name.length < 40 && !isUiNoise(name)) return name;
+      }
+
+      const meetNode = document.querySelector(`
+        div[data-is-muted="false"] [class*="zWfiBx"],
+        div[aria-label*="is speaking" i],
+        span[class*="zWfiBx"],
+        div[class*="zs5Szb"]
+      `);
+      if (meetNode && meetNode.innerText && meetNode.innerText.trim()) {
+        const name = meetNode.innerText.trim();
+        if (name && name.length < 40 && !isUiNoise(name)) return name;
+      }
+    } catch (e) {}
+    return 'interviewer';
+  }
+
+  function emitInPageCaption(speaker, text) {
+    if (!text || text.trim() === '') return;
+    const clean = text.trim();
+    if (isUiNoise(clean)) return;
+    if (clean === lastCapturedCaption) return;
+    lastCapturedCaption = clean;
+
+    let finalSpeaker = speaker ? speaker.trim() : '';
+    if (!finalSpeaker || finalSpeaker.toLowerCase() === 'speaker' || isUiNoise(finalSpeaker)) {
+      finalSpeaker = detectActiveSpeakerName();
+    }
+
+    try {
+      chrome.runtime.sendMessage({
+        type: 'INPAGE_CAPTION',
+        speaker: finalSpeaker || 'interviewer',
+        text: clean
+      }).catch(() => {});
+    } catch (e) {}
+  }
+
+  function scanInPageCaptions() {
+    // 1. Google Meet
+    const meetNodes = document.querySelectorAll(`
+      div[jsname="YSStwy"] div, div[jsname="r4nke"] div,
+      div[class*="a7vLMe"] div, div[class*="nM4d2c"] div,
+      div[class*="n74d0c"] div, div[class*="bhZpf"] div,
+      div[class*="iL4vfe"], div[class*="cM9B2"], div[class*="T4523c"],
+      div[class*="Z6B62d"], div[class*="vD79td"]
+    `);
+    meetNodes.forEach(node => {
+      const text = node.innerText?.trim();
+      if (!text || text.length < 2 || text.includes('meet.google.com')) return;
+      const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+      if (lines.length >= 2 && lines[0].length < 35) {
+        emitInPageCaption(lines[0].replace(/:\s*$/, ''), lines.slice(1).join(' '));
+      } else {
+        emitInPageCaption('', text);
+      }
+    });
+
+    // 2. Zoom Web
+    const zoomItems = document.querySelectorAll('.transcript-item, div[class*="transcript-item"], div[class*="transcriptItem"]');
+    if (zoomItems.length > 0) {
+      zoomItems.forEach(item => {
+        const nameEl = item.querySelector('.transcript-item-name, [class*="speaker"], [class*="name"]');
+        const textEl = item.querySelector('.transcript-item-text, [class*="text"], [class*="content"]');
+        const spk = nameEl ? nameEl.innerText.trim() : 'interviewer';
+        const txt = textEl ? textEl.innerText.trim() : item.innerText.replace(spk, '').trim();
+        if (txt && txt.length > 1) emitInPageCaption(spk, txt);
+      });
+      return;
+    }
+
+    const zoomCandidates = document.querySelectorAll(`
+      .caption-container, .subtitle-container, .closed-caption-container,
+      div[class*="zm-caption"], div[class*="zm-subtitle"], div[class*="closed-caption"]
+    `);
+    zoomCandidates.forEach(node => {
+      const raw = node.innerText?.trim();
+      if (!raw || raw.length < 2 || raw.includes('zoom.us')) return;
+      const spkEl = node.querySelector('.speaker-name, .caption-speaker, span[class*="speaker"]');
+      const spk = spkEl ? spkEl.innerText.trim() : '';
+      emitInPageCaption(spk, raw.replace(spk, '').trim());
+    });
+  }
+
+  function startCaptionObserver() {
+    if (captionObserver) return;
+    captionObserver = new MutationObserver(() => {
+      scanInPageCaptions();
+    });
+    captionObserver.observe(document.body, { childList: true, subtree: true, characterData: true });
+    setInterval(scanInPageCaptions, 2000);
+  }
+
+  startCaptionObserver();
+
   // ─── Signal ready ─────────────────────────────
   chrome.runtime.sendMessage({ type: 'OVERLAY_READY' }).catch(() => {});
 })();

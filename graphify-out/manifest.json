@@ -45,8 +45,8 @@
     "semantic_hash": ""
   },
   "lib/stt-deepgram.js": {
-    "mtime": 1781187258.84869,
-    "ast_hash": "ea9c6d50ac8c8d032fcdb1af33c72e19",
+    "mtime": 1786318644.3731818,
+    "ast_hash": "19c02a31e0152caaa26736fc43907802",
     "semantic_hash": ""
   },
   "lib/stt-manager.js": {
@@ -65,8 +65,8 @@
     "semantic_hash": ""
   },
   "manifest.json": {
-    "mtime": 1786316059.663988,
-    "ast_hash": "20cfd645476bbd4e8485baccef8f4255",
+    "mtime": 1786318630.643075,
+    "ast_hash": "75824d7934dbbe85969e398230f66334",
     "semantic_hash": ""
   },
   "offscreen.js": {

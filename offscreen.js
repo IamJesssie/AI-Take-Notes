@@ -141,6 +141,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       userContext = message.userContext || '';
       return false;
 
+    case 'ENGINE_TRANSCRIPT':
+      if (message.provider === 'inpage' && message.text) {
+        handleTranscript({
+          speaker: message.speaker || 'interviewer',
+          text: message.text,
+          isFinal: true,
+          provider: 'inpage'
+        });
+      }
+      return false;
+
     case 'ENGINE_GET_STATE':
       sendResponse({
         isActive: state === STATE.RUNNING || state === STATE.WIRED,

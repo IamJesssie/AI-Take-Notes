@@ -437,6 +437,21 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         broadcastToRuntime({ type: 'SETTINGS_UPDATED', settings: message.settings });
       });
       async = true;
+    // ── From in-page content script: captions with real speaker names ──
+    case 'INPAGE_CAPTION':
+      chrome.runtime.sendMessage({
+        type: 'ENGINE_TRANSCRIPT',
+        target: 'offscreen',
+        speaker: message.speaker || 'interviewer',
+        text: message.text,
+        provider: 'inpage'
+      }).catch(() => {});
+      broadcastToRuntime({
+        type: 'ENGINE_TRANSCRIPT',
+        speaker: message.speaker || 'interviewer',
+        text: message.text,
+        provider: 'inpage'
+      });
       break;
 
     // ── From offscreen engine: relay to sidepanel + overlay ──
